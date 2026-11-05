@@ -23,6 +23,10 @@ npx skills add arotadosmilagres-lgtm/silver-spork -g -a claude-code -y
 
 As 7 skills acima de `ui-ux-pro-max` até `slides` são cópia da [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) (licença MIT, de Next Level Builder).
 
+| Skill | O que faz |
+|---|---|
+| `impeccable` | Cria, revisa, audita e dá acabamento em sites, apps e telas de celular. Tem comandos como `audit`, `polish`, `animate`, `colorize`. Cópia da [Impeccable](https://github.com/pbakaus/impeccable) (licença Apache 2.0, de Paul Bakaus). |
+
 ## Skills de terceiros que eu uso
 
 | Skill | O que faz | Instalar |
