@@ -27,6 +27,19 @@ As 7 skills acima de `ui-ux-pro-max` até `slides` são cópia da [UI/UX Pro Max
 |---|---|
 | `impeccable` | Cria, revisa, audita e dá acabamento em sites, apps e telas de celular. Tem comandos como `audit`, `polish`, `animate`, `colorize`. Cópia da [Impeccable](https://github.com/pbakaus/impeccable) (licença Apache 2.0, de Paul Bakaus). |
 
+| Skill | O que faz |
+|---|---|
+| `gsap-core` | Base das animações GSAP: movimento, easing, stagger, responsivo. |
+| `gsap-timeline` | Sequências de animação encadeadas. |
+| `gsap-scrolltrigger` | Animações que acontecem com a rolagem da página. |
+| `gsap-plugins` | Plugins: SplitText, Flip, Draggable, ScrollSmoother e outros. |
+| `gsap-utils` | Funções auxiliares do GSAP. |
+| `gsap-react` | GSAP no React e Next.js. |
+| `gsap-frameworks` | GSAP no Vue, Svelte e outros. |
+| `gsap-performance` | Animações leves e rápidas. |
+
+As 8 skills `gsap-*` são cópia das [GSAP Skills oficiais](https://github.com/greensock/gsap-skills) (licença MIT, de GreenSock).
+
 ## Skills de terceiros que eu uso
 
 | Skill | O que faz | Instalar |
