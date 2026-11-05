@@ -5,7 +5,7 @@ Coleção pessoal de skills para o Claude Code. Cada pasta é uma skill com um `
 ## Instalar
 
 ```bash
-npx skills add SEU-USUARIO/minhas-skills -g -a claude-code -y
+npx skills add arotadosmilagres-lgtm/silver-spork -g -a claude-code -y
 ```
 
 ## Skills
