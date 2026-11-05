@@ -10,7 +10,9 @@ npx skills add arotadosmilagres-lgtm/silver-spork -g -a claude-code -y
 
 ## Skills
 
-_(nenhuma ainda)_
+| Skill | O que faz |
+|---|---|
+| `design-taste-frontend` | Cria e melhora sites com cara profissional. Cópia da [Taste Skill](https://github.com/Leonxlnx/taste-skill) (licença MIT, de Leonxlnx). |
 
 ## Skills de terceiros que eu uso
 
