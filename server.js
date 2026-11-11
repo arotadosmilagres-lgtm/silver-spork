@@ -5,7 +5,7 @@ const _die = (m) => { console.log('\nERRO: ' + m + '\n\nEsta janela fica aberta 
 process.on('uncaughtException', (e) => _die(e && e.stack || String(e)));
 process.on('unhandledRejection', (e) => _log('rejection: ' + (e && e.stack || e)));
 const http = require('http'), fs = require('fs'), path = require('path'), os = require('os');
-const VERSION = '2.1.0';
+const VERSION = '2.1.1';
 const UPDATE_BASE = process.env.CONTENT_UPDATE_URL || 'https://raw.githubusercontent.com/arotadosmilagres-lgtm/silver-spork/content-app/';
 const PORT = process.env.PORT || 3000;
 const newer = (a, b) => { const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); } return false; };

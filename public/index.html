@@ -257,7 +257,7 @@ button:disabled{opacity:.5;cursor:wait}
 <div id="ed">
   <div class="etop"><button id="edback">← Voltar</button><b id="edtitle"></b><button id="edUndo" title="Desfazer (Ctrl+Z)">↶</button><button id="edRedo" title="Refazer (Ctrl+Y)">↷</button><span class="ok" id="saved"></span><span class="sp"></span>
     <select id="edSt" style="width:auto"><option>Rascunho</option><option>Pronto</option><option>Postado</option></select><input id="edDate" type="date" style="width:auto" title="Data planejada">
-    <button id="edCap">Copiar legenda</button><select id="edImgStyle" style="width:auto" title="Estilo das imagens geradas por IA"></select><button id="edImgs">Gerar imagens dos slides</button><button id="edFx" title="Remove as esferas/faixa e gera imagens com a IA">Trocar efeitos por imagem de IA</button><button id="edReel">Virar Reel</button><button id="dlone">PNG do slide</button><button id="dlzip">ZIP</button><button id="toFigma" title="Cria este carrossel no Figma, com textos e formas editáveis (precisa do plugin Content aberto no Figma)">Enviar pro Figma</button><button id="dlsvg" title="Arquivos SVG com texto e formas editáveis no Figma">SVG p/ Figma</button><button id="dlall" class="pri">Todos os PNGs</button></div>
+    <button id="edCap">Copiar legenda</button><select id="edImgStyle" style="width:auto" title="Estilo das imagens geradas por IA"></select><button id="edImgs">Gerar imagens dos slides</button><button id="edFx" title="Remove as esferas/faixa e gera imagens com a IA">Trocar efeitos por imagem de IA</button><button id="edReel">Virar Reel</button><button id="dlone">PNG do slide</button><button id="dlzip">ZIP</button><button id="copyFigma" class="pri" title="Copia todos os slides. No Figma (app ou site), clique numa área vazia e aperte Ctrl+V">Copiar pro Figma</button><button id="toFigma" title="Cria este carrossel no Figma, com textos e formas editáveis (precisa do plugin Content aberto no Figma)">Enviar pro plugin</button><button id="dlsvg" title="Arquivos SVG com texto e formas editáveis no Figma">SVG p/ Figma</button><button id="dlall" class="pri">Todos os PNGs</button></div>
   <div class="ebody">
     <aside class="el"><div class="lh">Slides <button id="addsl">+ Slide</button></div><div id="thumbs"></div><div class="lh">Camadas</div><div id="layers"></div></aside>
     <section class="ec">
@@ -675,6 +675,27 @@ function slideSvg(i) {
   } finally { wrap.remove(); }
   return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">\n<defs>${defs.join('')}</defs>\n${body.join('\n')}\n</svg>`;
 }
+// Copia todos os slides como SVG: no Figma é só apertar Ctrl+V (funciona no site e no app, sem plugin).
+function figmaClip() {
+  const GAP = 80, parts = [], defs = [];
+  slides.forEach((_, i) => {
+    let svg = slideSvg(i);
+    const P = 's' + (i + 1) + '_';
+    svg = svg.replace(/id="(bg|gl|ov|cpb|bd\d+|bl\d+|ob\d+|cp\d+)"/g, `id="${P}$1"`).replace(/id="(Fundo|Brilho|Imagem|Imagem de fundo|Escurecimento)"/g, `id="$1 ${i + 1}"`).replace(/url\(#([^)]+)\)/g, `url(#${P}$1)`);
+    const d = /<defs>([\s\S]*?)<\/defs>/.exec(svg); if (d) defs.push(d[1]);
+    const body = svg.slice(svg.indexOf('</defs>') + 7, svg.lastIndexOf('</svg>'));
+    defs.push(`<clipPath id="${P}clip"><rect width="1080" height="1350"/></clipPath>`);
+    parts.push(`<g id="Slide ${i + 1}" transform="translate(${i * (1080 + GAP)} 0)" clip-path="url(#${P}clip)">${body}</g>`);
+  });
+  const W = slides.length * 1080 + (slides.length - 1) * GAP;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="1350" viewBox="0 0 ${W} 1350"><defs>${defs.join('')}</defs>${parts.join('\n')}</svg>`;
+}
+$('#copyFigma').onclick = (e) => busy(e.target, 'Copiando…', async () => {
+  const svg = figmaClip();
+  try { await navigator.clipboard.writeText(svg); }
+  catch { const t = document.createElement('textarea'); t.value = svg; document.body.append(t); t.select(); document.execCommand('copy'); t.remove(); }
+  toast('Copiado! Agora vá no Figma, clique numa área vazia e aperte Ctrl+V.');
+});
 $('#toFigma').onclick = (e) => busy(e.target, 'Enviando…', async () => {
   await persistNow(); if (!curId) throw new Error('Salve o carrossel antes de enviar.');
   const r = await api('/api/figma/send', { id: curId });

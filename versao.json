@@ -1,1 +1,1 @@
-{"version":"2.1.0","files":["server.js","public/index.html","figma/manifest.json","figma/code.js","figma/ui.html"],"notes":"Novo: botão Enviar pro Figma (com o plugin Content no Figma)."}
+{"version":"2.1.1","files":["server.js","public/index.html","figma/manifest.json","figma/code.js","figma/ui.html"],"notes":"Novo: botão Copiar pro Figma (é só apertar Ctrl+V no Figma, sem plugin)."}
