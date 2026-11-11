@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Content</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 Inter,system-ui,-apple-system,sans-serif;color:#111;background:#fff;display:flex;min-height:100vh}
+nav{width:190px;padding:24px 16px;border-right:1px solid #eee;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:2px}
+nav b{font-size:18px;margin:0 8px 18px}
+nav a{padding:7px 10px;border-radius:6px;color:#444;cursor:pointer}
+nav a.on{background:#f3f3f3;color:#000;font-weight:600}
+nav .bottom{margin-top:auto}
+main{flex:1;max-width:1000px;padding:40px 48px}
+h1{font-size:26px;margin:0 0 4px}
+.sub{color:#777;margin:0 0 24px}
+label{display:block;font-size:12px;color:#666;margin:14px 0 4px}
+input,textarea,select{width:100%;padding:9px 11px;border:1px solid #ddd;border-radius:8px;font:inherit;background:#fff}
+textarea{min-height:70px;resize:vertical}
+button{font:inherit;padding:8px 14px;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
+button.pri{background:#111;color:#fff;border-color:#111}
+button:disabled{opacity:.5;cursor:wait}
+.row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}.row>*{flex:1;min-width:140px}.row>button{flex:0}
+.idea{display:flex;gap:16px;align-items:center;padding:16px 0;border-top:1px solid #eee}
+.idea .sc{width:36px;font-size:20px;font-weight:600;color:#3a7d1e}
+.idea .t{flex:1}.idea .t small{color:#888;display:block}
+.sec{border:1px solid #eee;border-radius:12px;padding:20px;margin-bottom:20px}
+.sec h3{margin:0 0 4px;font-size:15px}
+.ok{color:#3a7d1e;font-size:12px}
+#toast{position:fixed;bottom:20px;right:20px;background:#111;color:#fff;padding:10px 16px;border-radius:8px;display:none;max-width:380px}
+#toast.err{background:#b3261e}
+.view{display:none}.view.on{display:block}
+.slides{display:flex;gap:18px;flex-wrap:wrap;margin-top:20px}
+.card{width:324px}
+.wrap{width:324px;height:405px;overflow:hidden;border-radius:6px;border:1px solid #e5e5e5}
+.slide{width:1080px;height:1350px;transform:scale(.3);transform-origin:top left;position:relative;overflow:hidden;padding:0 90px 190px;display:flex;flex-direction:column;justify-content:flex-end;font-family:Inter,system-ui,sans-serif}
+.slide .bg,.slide .ov{position:absolute;inset:0}
+.slide .bg{background-size:cover;background-position:center}
+.slide>h2,.slide>p{position:relative}
+.slide .tag{position:absolute;top:80px;left:90px;font-size:32px;font-weight:500;opacity:.8}
+.slide .pg{position:absolute;bottom:80px;left:90px;font-size:30px;opacity:.55;letter-spacing:.05em}
+.slide h2{font-size:96px;line-height:1.04;font-weight:600;letter-spacing:-.025em;margin:0 0 44px;outline:none}
+.slide h2::before{content:'';display:block;width:120px;height:10px;border-radius:5px;background:var(--ac);margin-bottom:48px}
+.slide p{font-size:44px;line-height:1.38;margin:0;opacity:.85;outline:none;max-width:860px}
+.slide.cover h2{font-size:122px}
+.slide.dark{--ac:#3d6bff;background:radial-gradient(900px 700px at 90% 8%,rgba(61,107,255,.45),transparent 70%),linear-gradient(165deg,#050816 0%,#0a1650 100%);color:#fff}
+.slide.dark .ov{background:linear-gradient(0deg,rgba(5,8,22,.94) 10%,rgba(5,8,22,.25))}
+.slide.light{--ac:#1f5c4a;background:#f4f1ea;color:#1c1b19}
+.slide.light .ov{background:linear-gradient(0deg,rgba(244,241,234,.95) 10%,rgba(244,241,234,.3))}
+.slide.light h2{font-family:Georgia,'Times New Roman',serif;font-weight:400}
+.al-center h2::before{margin-left:auto;margin-right:auto}.al-right h2::before{margin-left:auto}
+.al-center p{margin:0 auto}.al-right p{margin-left:auto}
+.ctl{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;align-items:center}
+.ctl button{padding:4px 8px;font-size:12px}
+.ctl input[type=color]{width:34px;height:28px;padding:0;border:1px solid #ddd;border-radius:6px;cursor:pointer}
+.ctl input[type=range]{width:90px;padding:0}
+#ed{display:none;position:fixed;inset:0;z-index:50;background:#fff;flex-direction:column}
+.etop{flex-wrap:wrap;display:flex;gap:10px;align-items:center;padding:10px 16px;border-bottom:1px solid #eee}.etop .sp{flex:1}
+.ebody{flex:1;display:flex;min-height:0}
+.el{width:210px;border-right:1px solid #eee;overflow:auto;padding:12px;flex:none}
+.er{width:270px;border-left:1px solid #eee;overflow:auto;padding:12px 14px;flex:none}
+.ec{flex:1;display:flex;flex-direction:column;min-width:0}
+.tools{display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid #eee;justify-content:center}
+.tools button,.er button,.lh button{font-size:12px;padding:5px 10px}
+#stage{flex:1;display:flex;align-items:center;justify-content:center;background:#f4f4f4;min-height:0;overflow:hidden;touch-action:none}
+#cv{position:relative;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,.14)}
+.capb{padding:8px 12px;border-top:1px solid #eee}.capb textarea{min-height:56px;height:56px}
+.lh{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#777;margin:8px 0 6px}
+.th{margin-bottom:8px;cursor:pointer;border:2px solid transparent;border-radius:6px;padding:2px}.th.on{border-color:#3d6bff}
+.thw{width:100%;aspect-ratio:4/5;overflow:hidden;border-radius:4px}
+.ly{padding:5px 8px;border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ly.on{background:#eaf0ff}
+.sl{width:1080px;height:1350px;position:relative;overflow:hidden;font-family:Inter,system-ui,sans-serif}
+.sl .bgi,.sl .ov{position:absolute;inset:0}.sl .bgi{background-size:cover;background-position:center}
+.sl.dark{background:radial-gradient(900px 700px at 90% 8%,rgba(61,107,255,.45),transparent 70%),linear-gradient(165deg,#050816 0%,#0a1650 100%)}
+.sl.dark .ov{background:linear-gradient(0deg,rgba(5,8,22,.94) 10%,rgba(5,8,22,.25))}
+.sl.light{background:#f4f1ea}.sl.light .ov{background:linear-gradient(0deg,rgba(244,241,234,.95) 10%,rgba(244,241,234,.3))}
+.e{position:absolute;box-sizing:border-box;cursor:move;user-select:none;word-break:break-word}
+.e[contenteditable=true]{cursor:text;user-select:text}
+.hd{position:absolute;background:#fff;border:2px solid #3d6bff;cursor:nwse-resize}
+.er label{margin:10px 0 3px}.er .g{display:grid;grid-template-columns:1fr 1fr;gap:6px}.er .g input,.er .g select{padding:6px 8px}
+.acts{display:flex;gap:8px;margin-top:8px}
+</style>
+</head>
+<body>
+<nav>
+  <b>Content</b>
+  <select id="clientsel" title="Cliente ativo" style="margin:0 0 14px"></select>
+  <a data-v="rad">Radar</a>
+  <a data-v="ideas" class="on">Ideias</a>
+  <a data-v="car">Carrosséis</a>
+  <a data-v="sty">Estilos</a>
+  <a data-v="scr">Roteiros</a>
+  <a data-v="lib">Biblioteca</a>
+  <a data-v="cfg" class="bottom">Configurações</a>
+</nav>
+<main>
+
+<section id="ideas" class="view on">
+  <h1>Ideias</h1><p class="sub">Crie pautas à mão ou peça sugestões à IA. Escolha uma para virar carrossel.</p>
+  <div class="row">
+    <div><label>Título da ideia</label><input id="nt" placeholder="Ex.: Demitido sem justa causa: o que você recebe"></div>
+    <div><label>Gancho (opcional)</label><input id="nh" placeholder="Ex.: Muita gente sai sem receber isso"></div>
+    <button class="pri" id="add">Adicionar</button>
+  </div>
+  <div class="row" style="margin-top:12px">
+    <div><label>Sugerir com IA — tema (opcional)</label><input id="topic" placeholder="Ex.: reforma trabalhista, home office"></div>
+    <button id="sug">Sugerir 5 ideias</button>
+  </div>
+  <div id="list" style="margin-top:24px"></div>
+</section>
+
+<section id="car" class="view">
+  <h1>Carrosséis</h1><p class="sub">A IA escreve os slides. Clique no texto de qualquer slide para editar.</p>
+  <div class="row">
+    <div style="flex:3"><label>Ideia</label><input id="ct"></div>
+    <div><label>Formato</label><select id="cf"><option value="car">Carrossel</option><option value="post">Post de imagem única</option></select></div>
+    <div id="cnw"><label>Slides</label><select id="cn"><option>5</option><option selected>7</option><option>9</option><option>11</option></select></div>
+    <div><label>Estilo</label><select id="cs"><option value="dark">Escuro</option><option value="light">Claro</option></select></div>
+    <div><label>Imagens por IA</label><select id="ci"><option value="99" selected>Todos os slides</option><option value="0">Nenhuma (só prompts)</option><option value="1">Só a capa</option><option value="3">Até 3</option><option value="5">Até 5</option></select></div>
+  </div>
+  <div class="row"><div><label>Estilo das imagens</label><select id="cis"></select></div><div><label>Elementos da marca (estrelas, ícones...)</label><select id="cas"><option value="0">Não colocar sozinho</option><option value="1">Um por slide</option></select></div></div>
+  <label>Instrução (opcional)</label><input id="cx" placeholder="Ex.: terminar com CTA para a minha consultoria">
+  <div style="margin-top:14px"><button class="pri" id="gen">Gerar</button></div>
+  </section>
+
+<section id="rad" class="view">
+  <h1>Radar</h1><p class="sub">Busca notícias dos temas que você monitora e transforma em ideias com nota. As ideias novas aparecem em Ideias.</p>
+  <div class="acts" style="align-items:center"><button class="pri" id="rdRun">Atualizar agora</button><span class="sub" id="rdInfo" style="margin:0"></span></div>
+  <p class="sub" style="margin-top:10px">Temas, bloqueios, fontes extras e atualização automática ficam em Configurações → Perfil do cliente. A atualização automática só roda enquanto a janela preta estiver aberta.</p>
+  <h3 style="margin:24px 0 4px">Notícias captadas</h3><div id="rdList"></div>
+</section>
+
+<section id="sty" class="view">
+  <h1>Estilos</h1><p class="sub">Envie prints dos seus carrosséis ou de referências. A IA aprende cores, fontes e clima, e os carrosséis novos seguem esse estilo.</p>
+  <div id="stList"></div>
+  <div class="sec"><h3>Novo estilo</h3>
+    <label>Nome do estilo</label><input id="stName">
+    <label>Prints dos carrosséis (de 3 a 12; quanto mais, melhor)</label><input id="stFiles" type="file" accept="image/*" multiple>
+    <label>Personagens ou referências para as imagens (opcional, até 3)</label><input id="stRefs" type="file" accept="image/*" multiple>
+    <label>Elementos da identidade visual: estrelas, ícones, detalhes (opcional, PNG com fundo transparente é o ideal)</label><input id="stAssets" type="file" accept="image/png,image/svg+xml,image/webp,image/jpeg" multiple>
+    <label>Observação (opcional)</label><input id="stNote" placeholder="Ex.: gosto mais dos slides escuros; sempre usar foto na capa">
+    <label style="display:flex;gap:8px;align-items:center"><input id="stDef" type="checkbox" style="width:auto" checked> Usar como estilo padrão</label>
+    <div style="margin-top:12px"><button class="pri" id="stCreate">Criar estilo</button></div>
+  </div>
+  <p class="sub">Para estudar prints, use Gemini ou Claude como provedor de texto.</p>
+</section>
+
+<section id="scr" class="view">
+  <h1>Roteiros</h1><p class="sub">Roteiro de Reel com a duração calculada pelo seu ritmo de fala. Edite a fala, copie os prompts das cenas e grave lendo no teleprompter.</p>
+  <div class="row">
+    <div style="flex:3"><label>Ideia</label><input id="scT" placeholder="Escolha uma ideia em Ideias ou escreva aqui"></div>
+    <div><label>Duração</label><select id="scD"><option value="30">30 s</option><option value="45" selected>45 s</option><option value="60">60 s</option><option value="90">90 s</option></select></div>
+    <div><label>Nível do público</label><select id="scL"><option>Iniciante</option><option>Intermediário</option><option>Avançado</option></select></div>
+  </div>
+  <label>Instrução (opcional)</label><input id="scX" placeholder="Ex.: começar com uma pergunta; terminar chamando para o WhatsApp">
+  <div style="margin-top:14px"><button class="pri" id="scGen">Gerar roteiro</button></div>
+  <div id="scOut" style="display:none">
+    <div class="acts" style="align-items:center;margin-top:24px"><b id="scStats"></b><span class="ok" id="scSaved"></span></div>
+    <div class="acts" style="margin:8px 0 14px;flex-wrap:wrap"><button class="pri" id="scTp">Teleprompter</button><button id="scCopy">Copiar roteiro</button><button id="scAdd">+ Bloco</button></div>
+    <div id="scBlocks"></div>
+    <label>Legenda do post</label><textarea id="scCap" style="min-height:100px"></textarea>
+    <div class="acts"><button id="scCapCopy">Copiar legenda</button></div>
+  </div>
+  <h3 style="margin:34px 0 4px">Roteiros salvos</h3><div id="scList"></div>
+</section>
+
+<section id="lib" class="view">
+  <h1>Biblioteca</h1><p class="sub">Seus carrosséis ficam salvos aqui sozinhos. Abra um para continuar editando.</p>
+  <div id="liblist"></div>
+</section>
+
+<section id="cfg" class="view">
+  <h1>Configurações</h1><p class="sub">As chaves ficam salvas só no seu computador e nunca vão para o navegador.</p>
+  <div class="sec">
+    <h3>Atualização e backup</h3>
+    <p class="sub" style="margin:4px 0 10px">Versão <b id="appVer">…</b>. O Content se atualiza sozinho sempre que você abre pelo ícone. Seus dados ficam em <code id="dataDir"></code> e uma cópia de segurança é feita todo dia.</p>
+    <button id="updBtn">Procurar atualização agora</button>
+    <button id="bkSave" style="margin-left:8px">Baixar backup (chaves, clientes e carrosséis)</button>
+    <button id="bkLoad" style="margin-left:8px">Restaurar backup</button><input id="bkFile" type="file" accept=".json,application/json" style="display:none">
+    <p class="sub" style="margin:8px 0 0">O arquivo de backup tem suas chaves: guarde em lugar seguro (por exemplo, no seu Google Drive) e não mande para ninguém.</p>
+  </div>
+  <div class="sec">
+    <h3>Conta e chaves (valem para todos os clientes)</h3>
+    <label>Quem escreve os textos (ideias, slides, legenda)</label>
+    <select id="provider">
+      <option value="gemini">Gemini (Google): tem plano gratuito</option>
+      <option value="groq">Groq: tem plano gratuito</option>
+      <option value="openrouter">OpenRouter: modelos gratuitos (:free)</option>
+      <option value="xai">Grok (xAI): pago</option>
+      <option value="anthropic">Claude (Anthropic): pago</option>
+    </select>
+    <p class="sub" style="margin:6px 0 0">Cadastre só a chave do provedor que você escolheu. As outras podem ficar em branco.</p>
+    <div class="row">
+      <div><label>Chave Gemini <span class="ok" id="ka_gemini"></span></label><input id="k_gemini" type="password" placeholder="AIza..." autocomplete="off"></div>
+      <div><label>Modelo Gemini (texto)</label><input id="m_gemini"></div>
+    </div>
+    <div class="row">
+      <div><label>Chave Groq <span class="ok" id="ka_groq"></span></label><input id="k_groq" type="password" placeholder="gsk_..." autocomplete="off"></div>
+      <div><label>Modelo Groq</label><input id="m_groq"></div>
+    </div>
+    <div class="row">
+      <div><label>Chave OpenRouter <span class="ok" id="ka_openrouter"></span></label><input id="k_openrouter" type="password" placeholder="sk-or-..." autocomplete="off"></div>
+      <div><label>Modelo OpenRouter</label><input id="m_openrouter"></div>
+    </div>
+    <div class="row">
+      <div><label>Chave Grok (xAI) <span class="ok" id="ka_xai"></span></label><input id="k_xai" type="password" placeholder="xai-..." autocomplete="off"></div>
+      <div><label>Modelo Grok</label><input id="m_xai"></div>
+    </div>
+    <div class="row">
+      <div><label>Chave Claude (Anthropic) <span class="ok" id="ka_anthropic"></span></label><input id="k_anthropic" type="password" placeholder="sk-ant-..." autocomplete="off"></div>
+      <div><label>Modelo Claude</label><input id="m_anthropic"></div>
+    </div>
+    <label>Quem gera as imagens</label>
+    <select id="imgprov"><option value="gemini">Gemini (exige billing no Google)</option><option value="agnes">Agnes</option><option value="free">Gratuito (Flux, sem chave)</option></select>
+    <div class="row"><div><label>Modelo de imagem do Gemini</label><input id="m_image"></div></div>
+    <div class="row">
+      <div><label>Chave Agnes <span class="ok" id="ka_agnes"></span></label><input id="k_agnes" type="password" placeholder="Cole a chave da Agnes" autocomplete="off"></div>
+      <div><label>Modelo de imagem Agnes</label><input id="m_agnes"></div>
+      <div><label>Resolução (Agnes: 1K, 2K, 3K ou 4K)</label><input id="m_agnessize" placeholder="2K"></div>
+    </div>
+    <p class="sub" style="margin:10px 0 0">Deixe a chave em branco para manter a que já está salva. Se um modelo mudar de nome, troque aqui.</p>
+  </div>
+  <div class="sec">
+    <h3>Perfil do cliente</h3>
+    <label>Nome do cliente (aparece na lista do menu)</label><input id="cname">
+    <label>Quem sou</label><textarea id="p_who"></textarea>
+    <label>Público</label><input id="p_audience">
+    <label>Posicionamento</label><input id="p_positioning">
+    <div class="row">
+      <div><label>Tom de voz</label><input id="p_tone"></div>
+      <div><label>Expressões que uso</label><input id="p_phrases"></div>
+    </div>
+    <label>Temas principais</label><input id="p_topics">
+    <label>Temas que não quero abordar</label><input id="p_blocked">
+    <label>Seu @ nos slides</label><input id="p_handle" placeholder="@seuperfil">
+    <div class="row">
+      <div><label>Nível do público</label><select id="p_level"><option>Iniciante</option><option>Intermediário</option><option>Avançado</option></select></div>
+      <div><label>Ritmo de fala (palavras por segundo)</label><input id="p_pace" type="number" step="0.1" min="1" max="5" placeholder="2.6"></div>
+    </div>
+    <label>Aparência das pessoas nas imagens (em inglês; vazio = pessoas brasileiras diversas)</label><input id="p_people" placeholder="Brazilian people, diverse skin tones">
+    <label>Monitorados pelo Radar (separe por vírgula)</label><input id="p_radar" placeholder="reforma trabalhista, TST, home office">
+    <label>Bloqueados no Radar (separe por vírgula)</label><input id="p_radarblock" placeholder="futebol, BBB, eleição">
+    <label>Fontes extras do Radar (links RSS, um por linha)</label><textarea id="p_feeds" style="min-height:60px"></textarea>
+    <label>Atualizar o Radar sozinho</label><select id="p_auto"><option value="">Desligado</option><option value="6">A cada 6 horas</option><option value="12">A cada 12 horas</option><option value="24">A cada 24 horas</option></select>
+  </div>
+  <div class="sec" style="margin-top:20px"><h3>Custos e limites</h3><p class="sub" id="usageInfo" style="margin:4px 0 0"></p>
+    <div class="row"><div><label>Limite de textos por dia (0 = sem limite)</label><input id="lim_texts" type="number" min="0"></div><div><label>Limite de imagens por dia (0 = sem limite)</label><input id="lim_images" type="number" min="0"></div></div></div>
+  <button class="pri" id="save">Salvar configurações</button> <button id="delcl" style="margin-left:8px">Excluir este cliente</button>
+</section>
+</main>
+
+<div id="ed">
+  <div class="etop"><button id="edback">← Voltar</button><b id="edtitle"></b><button id="edUndo" title="Desfazer (Ctrl+Z)">↶</button><button id="edRedo" title="Refazer (Ctrl+Y)">↷</button><span class="ok" id="saved"></span><span class="sp"></span>
+    <select id="edSt" style="width:auto"><option>Rascunho</option><option>Pronto</option><option>Postado</option></select><input id="edDate" type="date" style="width:auto" title="Data planejada">
+    <button id="edCap">Copiar legenda</button><select id="edImgStyle" style="width:auto" title="Estilo das imagens geradas por IA"></select><button id="edImgs">Gerar imagens dos slides</button><button id="edFx" title="Remove as esferas/faixa e gera imagens com a IA">Trocar efeitos por imagem de IA</button><button id="edReel">Virar Reel</button><button id="dlone">PNG do slide</button><button id="dlzip">ZIP</button><button id="dlsvg" title="Arquivos SVG com texto e formas editáveis no Figma">SVG p/ Figma</button><button id="dlall" class="pri">Todos os PNGs</button></div>
+  <div class="ebody">
+    <aside class="el"><div class="lh">Slides <button id="addsl">+ Slide</button></div><div id="thumbs"></div><div class="lh">Camadas</div><div id="layers"></div></aside>
+    <section class="ec">
+      <div class="tools"><button data-add="text">Texto</button><button data-add="rect">Retângulo</button><button data-add="ellipse">Elipse</button><button data-add="image">Imagem</button><button data-add="assets">Elementos da marca</button></div>
+      <div id="tray" style="display:none;gap:8px;padding:8px 12px;border-bottom:1px solid #eee;overflow-x:auto;align-items:center;white-space:nowrap"></div>
+      <div id="stage"><div id="cv"></div></div>
+      <div class="capb"><label style="margin:0 0 3px">Legenda do post</label><textarea id="cap"></textarea></div>
+    </section>
+    <aside class="er" id="panel"></aside>
+  </div>
+  <input type="file" id="fi" accept="image/*" hidden>
+</div>
+
+<div id="tp" style="display:none;position:fixed;inset:0;z-index:60;background:#000;color:#fff">
+  <div id="tpt" style="height:100%;overflow:auto;padding:45vh 8vw 60vh;font-size:64px;line-height:1.35;font-weight:500"></div>
+  <div style="position:fixed;bottom:16px;right:16px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+    <button id="tpSlow">Mais lento</button><button id="tpFast">Mais rápido</button><button id="tpMinus">A−</button><button id="tpPlus">A+</button><button id="tpGo" class="pri" style="background:#fff;color:#000">Iniciar</button><button id="tpX">Fechar</button>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const api = async (p, body) => {
+  let r;
+  try { r = await fetch(p, body ? { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) } : {}); }
+  catch { throw new Error('O Content está fechado. Abra de novo pelo ícone "Content" na área de trabalho.'); }
+  const j = await r.json().catch(() => ({ error: 'Resposta inválida do Content. Feche e abra de novo.' }));
+  if (!r.ok) throw new Error(j.error || 'Erro');
+  if (j && j._via) setTimeout(() => toast('O provedor principal estava ocupado: usei ' + j._via + ' desta vez.'), 300);
+  return j;
+};
+const toast = (m, err) => { const t = $('#toast'); t.textContent = m; t.className = err ? 'err' : ''; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => (t.style.display = 'none'), err ? 12000 : 4500); };
+const busy = async (btn, label, fn) => { const o = btn.textContent; btn.disabled = true; btn.textContent = label; try { await fn(); } catch (e) { toast(e.message, 1); } btn.disabled = false; btn.textContent = o; };
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// navegação
+function go(v) { document.querySelectorAll('.view').forEach((e) => e.classList.toggle('on', e.id === v)); document.querySelectorAll('nav a').forEach((a) => a.classList.toggle('on', a.dataset.v === v)); }
+document.querySelectorAll('nav a').forEach((a) => (a.onclick = () => { go(a.dataset.v); if (a.dataset.v === 'lib') loadLib(); if (a.dataset.v === 'scr') loadScripts(); if (a.dataset.v === 'rad') loadRadar(); if (a.dataset.v === 'sty') loadStyles(); if (a.dataset.v === 'ideas') api('/api/ideas').then((x) => { ideas = x; renderIdeas(); }); }));
+
+// ---------- Ideias ----------
+let ideas = [], current = null, slides = [], handle = '@seuperfil';
+const saveIdeas = () => api('/api/ideas', { ideas });
+function renderIdeas() {
+  $('#list').innerHTML = ideas.length ? '' : '<p class="sub">Nenhuma ideia ainda. Adicione uma acima ou peça sugestões à IA.</p>';
+  ideas.forEach((x, i) => {
+    const d = document.createElement('div'); d.className = 'idea';
+    d.innerHTML = `<div class="sc">${x.score ?? '—'}</div><div class="t"><b>${esc(x.title)}</b><small>${esc(x.hook || '')} ${x.format ? '· ' + esc(x.format) : ''} ${x.origin ? '· ' + esc(x.origin) : ''}</small></div><button class="pri">Carrossel</button><button class="pri">Roteiro</button><button>Excluir</button>`;
+    d.children[2].onclick = () => { current = x; $('#ct').value = x.title; go('car'); };
+    d.children[3].onclick = () => { scIdea = x; $('#scT').value = x.title; go('scr'); loadScripts(); };
+    d.children[4].onclick = () => { ideas.splice(i, 1); saveIdeas(); renderIdeas(); };
+    $('#list').append(d);
+  });
+}
+$('#add').onclick = () => { const t = $('#nt').value.trim(); if (!t) return toast('Escreva o título da ideia.', 1); ideas.unshift({ title: t, hook: $('#nh').value.trim(), format: 'Carrossel' }); $('#nt').value = $('#nh').value = ''; saveIdeas(); renderIdeas(); };
+$('#sug').onclick = (e) => busy(e.target, 'Pensando…', async () => { const r = await api('/api/ideas/suggest', { topic: $('#topic').value }); ideas = [...r.sort((a, b) => b.score - a.score), ...ideas]; saveIdeas(); renderIdeas(); });
+
+// ---------- Carrossel / Editor ----------
+let curId = null, saveT, activeId = null, si = 0, sel = null, editing = null, K = 0.4, fiMode = '', curMeta = { status: 'Rascunho', date: '' }, hist = [], hp = -1, histT;
+const TS = 0.168, SERIF = "Georgia,'Times New Roman',serif", FONTS = { sans: 'inherit', serif: "Georgia,'Times New Roman',serif", display: "Anton, Impact, 'Arial Narrow', sans-serif", grotesk: "'Space Grotesk', Inter, sans-serif" }, FONT_NAMES = { sans: 'Sem serifa', serif: 'Com serifa', display: 'Condensada pesada', grotesk: 'Grotesca moderna' }, ICON = { text: 'T', rect: '▭', ellipse: '○', image: '▣' };
+const newId = () => Math.random().toString(36).slice(2, 8);
+const cur = () => slides[si], selEl = () => cur().els.find((e) => e.id === sel);
+
+async function persistNow() {
+  if (!curId || !slides.length) return;
+  try { const r = await api('/api/carousels/save', { carousel: { id: curId, client: activeId, title: $('#ct').value || 'Sem título', style: slides[0]?.bg || 'dark', caption: $('#cap').value, status: curMeta.status, date: curMeta.date, imgStyle: curImg.style, styleId: curImg.styleId, slides } }); curId = r.id; $('#saved').textContent = 'Salvo na Biblioteca ✓'; }
+  catch (e) { $('#saved').textContent = ''; toast(e.message, 1); }
+}
+const imgReg = [], imgIdx = new Map();
+const ref = (v) => { if (typeof v === 'string' && v.startsWith('data:image')) { if (!imgIdx.has(v)) { imgIdx.set(v, imgReg.length); imgReg.push(v); } return '@img:' + imgIdx.get(v); } return v; };
+const snap = () => JSON.stringify({ slides, si }, (k, v) => ref(v));
+const unsnap = (t) => JSON.parse(t, (k, v) => (typeof v === 'string' && v.startsWith('@img:') ? imgReg[+v.slice(5)] : v));
+function commitHist() { const t = snap(); if (hist[hp] === t) return; hist = hist.slice(0, hp + 1); hist.push(t); if (hist.length > 40) hist.shift(); hp = hist.length - 1; }
+function undo(d) {
+  clearTimeout(histT); commitHist(); if (hp + d < 0 || hp + d >= hist.length) return;
+  hp += d; const o = unsnap(hist[hp]); slides = o.slides; si = Math.min(o.si, slides.length - 1); sel = null; editing = null; drawThumbs(); refresh(); persist();
+}
+function persist() { clearTimeout(histT); histT = setTimeout(commitHist, 350); clearTimeout(saveT); $('#saved').textContent = 'Salvando…'; saveT = setTimeout(persistNow, 900); }
+
+// converte o texto da IA em elementos editáveis
+const LAY = { pos: 'bottom', align: 'left', size: 'l', img: 'full', decor: 'bar' };
+function toSlide(o, i, n, theme, g) {
+  const dark = g ? !!g.dark : theme === 'dark', col = g?.text || (dark ? '#ffffff' : '#1c1b19'), ac = g?.accent || (dark ? '#3d6bff' : '#1f5c4a');
+  const hf = g?.mFont ? g.mFont : g ? (FONTS[g.heading_font] ? g.heading_font : 'sans') : (dark ? 'sans' : 'serif'), hw = hf === 'display' ? '400' : (g ? String(g.heading_weight || '600') : (dark ? '600' : '400')), caps = g?.mCaps ? true : !!g?.title_caps;
+  const kind = i === 0 ? 'cover' : (i === n - 1 && n > 1 ? 'cta' : 'content'), L = { ...LAY, ...(g?.layouts?.[kind] || {}) };
+  if (g?.forceImages && L.img === 'none') L.img = 'full';
+  if (g?.mSize) L.size = g.mSize;
+  if (g?.mGlow) L.decor = 'glow';
+  const fx = !!g?.mFx; if (fx) { L.img = 'none'; L.decor = 'fx'; }
+  let sz = { s: 70, m: 90, l: i === 0 ? 122 : 100, xl: 134, xxl: 150 }[L.size] || 100;
+  if (hf === 'display' && L.size !== 'xxl') sz = Math.round(sz * 1.3);
+  const fw = (hf === 'display' ? 0.52 : 0.58) * (caps ? 1.12 : 1);
+  const title = o.title || '', body = o.body || '';
+  let box = null, y0 = 180, y1 = 1160;
+  if (L.img === 'top') { box = { x: 0, y: 0, w: 1080, h: 700 }; y0 = 770; } else if (L.img === 'bottom') { box = { x: 0, y: 650, w: 1080, h: 700 }; y1 = 590; }
+  let th, bh, total;
+  const meas = () => { const per = Math.max(6, Math.floor(900 / (sz * fw))); let ln = 1, cu = 0; title.split(/\s+/).forEach((w) => { if (cu && cu + 1 + w.length > per) { ln++; cu = w.length; } else cu += (cu ? 1 : 0) + w.length; if (w.length > per) ln += Math.ceil(w.length / per) - 1; }); th = ln * Math.round(sz * 1.08); bh = body ? Math.max(1, Math.ceil(body.length / 36)) * 61 : 0; total = 58 + th + (body ? 44 : 0) + bh; };
+  meas(); while (total > y1 - y0 - 60 && sz > 56) { sz = Math.round(sz * 0.92); meas(); }
+  const top = Math.max(y0, L.pos === 'top' ? y0 : L.pos === 'middle' ? Math.round((y0 + y1 - total) / 2) : y1 - total), al = L.align;
+  const T = (y, w, text, size, x = {}) => ({ id: newId(), type: 'text', x: 90, y, w, text, size, color: col, align: al, weight: '400', op: 100, font: 'sans', ...x });
+  const els = [];
+  if (L.decor === 'frame') els.push({ id: newId(), type: 'rect', x: 50, y: 50, w: 980, h: 1250, fill: 'transparent', stroke: ac, sw: 4, op: 70 });
+  if (L.decor === 'glow') { els.push({ id: newId(), type: 'ellipse', x: 520, y: -300, w: 900, h: 900, fill: ac, op: 55, blur: 150 }, { id: newId(), type: 'ellipse', x: -380, y: 880, w: 760, h: 760, fill: ac, op: 38, blur: 150 }); }
+  if (L.decor === 'fx') {
+    const bg0 = g?.bg?.[0] || '#0b0714', V = [[[720, -150, 400], [-150, 1010, 380]], [[-170, -130, 380], [740, 980, 400]], [[400, -210, 360], [-120, 1060, 340]]][i % 3];
+    els.push({ id: newId(), type: 'ellipse', x: 520, y: -300, w: 900, h: 900, fill: ac, op: 50, blur: 150 }, { id: newId(), type: 'ellipse', x: -380, y: 880, w: 760, h: 760, fill: ac, op: 34, blur: 150 });
+  }
+  if (L.decor === 'circle') els.push({ id: newId(), type: 'ellipse', x: 640, y: -220, w: 640, h: 640, fill: ac, op: 28 });
+  els.push(T(80, 900, handle, 32, { weight: '500', op: 80 }));
+  if (L.decor === 'bar') els.push({ id: newId(), type: 'rect', x: al === 'center' ? 480 : al === 'right' ? 870 : 90, y: top, w: 120, h: 10, fill: ac, op: 100 });
+  els.push(T(top + 58, 900, title, sz, { weight: hw, font: hf, caps, lh: hf === 'display' ? 1 : 1.05 }));
+  if (body) els.push(T(top + 58 + th + 44, 900, body, 44, { op: 85, lh: 1.38 }));
+  els.push(T(1225, 900, `${i + 1}/${n}`, 30, { op: 55 }));
+  return { bg: dark ? 'dark' : 'light', bgcss: g?.bg?.[0] ? `linear-gradient(165deg,${g.bg[0]},${g.bg[1] || g.bg[0]})` : '', image: o.image || '', box, dim: o.dim ?? 100, image_prompt: (L.img === 'none' && !fx) ? '' : (o.image_prompt || ''), fx, els };
+}
+function place(n, e) { n.style.left = e.x + 'px'; n.style.top = e.y + 'px'; n.style.width = e.w + 'px'; n.style.height = e.type === 'text' ? 'auto' : e.h + 'px'; n.style.opacity = (e.op ?? 100) / 100;
+  n.style.transform = e.rot ? `rotate(${e.rot}deg)` : ''; n.style.filter = e.blur ? `blur(${e.blur}px)` : '';
+  const sh = e.sh ? `0 ${e.sh / 3}px ${e.sh}px rgba(0,0,0,.5)` : ''; if (e.type === 'text') n.style.textShadow = sh; else n.style.boxShadow = sh; }
+function styleNode(n, e) {
+  place(n, e);
+  if (e.type === 'text') Object.assign(n.style, { fontSize: e.size + 'px', color: e.color, textAlign: e.align, fontWeight: e.weight, fontFamily: FONTS[e.font] || 'inherit', textTransform: e.caps ? 'uppercase' : 'none', lineHeight: e.lh || 1.25, whiteSpace: 'pre-wrap', overflowWrap: 'normal', wordBreak: 'normal' });
+  else if (e.type === 'image') Object.assign(n.style, { backgroundImage: `url(${e.src})`, backgroundSize: e.fit || 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' });
+  else {
+    Object.assign(n.style, { background: e.stroke ? 'transparent' : e.fill, border: e.stroke ? `${e.sw || 4}px solid ${e.stroke}` : '0', borderRadius: e.type === 'ellipse' ? '50%' : (e.r || 0) + 'px' });
+    if (e.orb) Object.assign(n.style, { background: `radial-gradient(circle at 32% 26%, rgba(255,255,255,.9) 0, rgba(255,255,255,.28) 9%, ${e.fill} 36%, ${e.fill2} 100%)`, border: '2px solid rgba(255,255,255,.35)', boxShadow: `0 0 90px ${e.fill}99, inset 0 0 50px rgba(255,255,255,.22)` });
+    if (e.band) Object.assign(n.style, { background: `linear-gradient(90deg, transparent, ${e.fill} 18%, #fff 50%, ${e.fill} 82%, transparent)`, boxShadow: `0 0 40px ${e.fill}` });
+  }
+}
+function buildSlide(s, inter) {
+  const d = document.createElement('div'); d.className = 'sl ' + (s.bg || 'dark'); if (s.bgcss) d.style.background = s.bgcss;
+  if (s.image) d.innerHTML = s.box ? `<div class="bgi" style="background-image:url(${s.image});right:auto;bottom:auto;left:${s.box.x}px;top:${s.box.y}px;width:${s.box.w}px;height:${s.box.h}px"></div>` : `<div class="bgi" style="background-image:url(${s.image})"></div><div class="ov" style="opacity:${(s.dim ?? 100) / 100}"></div>`;
+  (s.els || []).forEach((e) => {
+    const n = document.createElement('div'); n.className = 'e'; n.dataset.id = e.id; if (e.type === 'text') n.textContent = e.text; styleNode(n, e);
+    if (inter && e.id === sel) {
+      n.style.outline = `${2 / K}px solid #3d6bff`;
+      if (e.id !== editing) ['nw', 'ne', 'sw', 'se'].forEach((c) => { const h = document.createElement('div'), z = 14 / K; h.className = 'hd'; h.dataset.c = c; h.style.cssText = `width:${z}px;height:${z}px;${c[0] === 'n' ? 'top' : 'bottom'}:${-z / 2}px;${c[1] === 'w' ? 'left' : 'right'}:${-z / 2}px;border-width:${2 / K}px;cursor:${c === 'nw' || c === 'se' ? 'nwse' : 'nesw'}-resize`; n.append(h); });
+    }
+    d.append(n);
+  });
+  return d;
+}
+function drawCanvas() {
+  const r = $('#stage').getBoundingClientRect(); K = Math.max(0.2, Math.min((r.width - 40) / 1080, (r.height - 40) / 1350));
+  const cv = $('#cv'); cv.style.width = 1080 * K + 'px'; cv.style.height = 1350 * K + 'px'; cv.innerHTML = '';
+  const n = buildSlide(cur(), true); n.style.transform = `scale(${K})`; n.style.transformOrigin = '0 0'; cv.append(n);
+}
+function thumb(i) {
+  const w = document.createElement('div'); w.className = 'th' + (i === si ? ' on' : ''); w.innerHTML = '<div class="thw"></div>';
+  const n = buildSlide(slides[i], false); n.style.transform = `scale(${TS})`; n.style.transformOrigin = '0 0'; w.firstChild.append(n);
+  w.onclick = () => { si = i; sel = null; drawThumbs(); refresh(); }; return w;
+}
+const drawThumbs = () => { $('#thumbs').innerHTML = ''; slides.forEach((_, i) => $('#thumbs').append(thumb(i))); };
+const drawThumb = () => { const o = $('#thumbs').children[si]; if (o) o.replaceWith(thumb(si)); };
+function drawLayers() {
+  $('#layers').innerHTML = [...cur().els].reverse().map((e) => `<div class="ly${e.id === sel ? ' on' : ''}" data-id="${e.id}">${ICON[e.type]} ${esc((e.text || { rect: 'Retângulo', ellipse: 'Elipse', image: 'Imagem' }[e.type] || '').slice(0, 24))}</div>`).join('');
+}
+const draw = () => { drawCanvas(); drawLayers(); drawThumb(); };
+const refresh = () => { draw(); panel(); };
+function openEditor() {
+  $('#ed').style.display = 'flex'; $('#edtitle').textContent = $('#ct').value; si = Math.min(si, slides.length - 1); sel = null; editing = null;
+  $('#edSt').value = curMeta.status; $('#edDate').value = curMeta.date; $('#edImgStyle').value = curImg.style; hist = []; hp = -1; commitHist(); drawThumbs(); refresh();
+}
+
+// painel da direita
+const num = (k, l, v) => `<div><label>${l}</label><input type="number" data-k="${k}" value="${Math.round(v)}"></div>`;
+const sele = (k, v, o, at = 'k') => `<select data-${at}="${k}">${o.map(([a, b]) => `<option value="${a}"${String(v) === a ? ' selected' : ''}>${b}</option>`).join('')}</select>`;
+function panel() {
+  const s = cur(), e = selEl(); let h;
+  if (!e) h = `<div class="lh"><b>Slide ${si + 1} de ${slides.length}</b></div>
+    <button data-a="sleft">◀</button><button data-a="sright">▶</button><button data-a="sdup">Duplicar</button><button data-a="sdel">Excluir</button>
+    <label>Tema do fundo</label>${sele('bg', s.bg, [['dark', 'Escuro'], ['light', 'Claro']], 's')}
+    <label>Imagem de fundo</label><button data-a="bgup">${s.image ? 'Trocar' : 'Enviar'} imagem</button>${s.image ? '<button data-a="bgrm">Remover</button><button data-a="detach" style="background:#1f5c4a;color:#fff"><b>Soltar imagem (mover, aumentar, girar)</b></button>' : ''}
+    ${s.image ? `<label>Escurecer a imagem</label><input type="range" min="0" max="100" data-s="dim" value="${s.dim ?? 100}">` : ''}
+    ${s.els.some((x) => x.orb || x.band) ? '<label>Esferas e faixa (efeitos)</label><button data-a="fx2ai">Trocar efeitos por imagem de IA (este slide)</button><button data-a="fx2aiall">Trocar em TODOS os slides</button>' : ''}
+    <label>Prompt da imagem (para Gemini ou Flow)</label><textarea data-s="image_prompt" style="min-height:90px">${esc(s.image_prompt)}</textarea>
+    <button data-a="copyp">Copiar prompt</button><button data-a="genimg">Gerar com API</button>
+    <label>Refazer o texto deste slide com IA</label><input id="rdI" placeholder="Ex.: mais direto; com um exemplo"><button data-a="redo">Refazer com IA</button>
+    <p class="sub" style="font-size:12px;margin-top:14px">Clique em um item para selecionar e arraste para mover. Dois cliques no texto para digitar. A tecla Delete apaga o item.</p>`;
+  else {
+    h = `<div class="lh"><b>${{ text: 'Texto', rect: 'Retângulo', ellipse: 'Elipse', image: 'Imagem' }[e.type]}</b></div>
+    <button data-a="dup">Duplicar</button><button data-a="del">Excluir</button><button data-a="front">Frente ↑</button><button data-a="back">Trás ↓</button>
+    <label>Posição e tamanho</label><div class="g">${num('x', 'X', e.x)}${num('y', 'Y', e.y)}${num('w', 'Largura', e.w)}${e.type === 'text' ? '' : num('h', 'Altura', e.h)}${num('rot', 'Rotação (°)', e.rot || 0)}</div>
+    <label>Opacidade</label><input type="range" min="0" max="100" data-k="op" value="${e.op ?? 100}">
+    <label>Sombra</label><input type="range" min="0" max="60" data-k="sh" value="${e.sh || 0}"><label>Desfoque</label><input type="range" min="0" max="30" data-k="blur" value="${e.blur || 0}">`;
+    if (e.type === 'text') h += `<label>Texto</label><div class="g">${num('size', 'Tamanho', e.size)}<div><label>Cor</label><input type="color" data-k="color" value="${e.color}" style="padding:2px;height:34px"></div></div>
+      <div class="g"><div><label>Alinhar</label>${sele('align', e.align, [['left', 'Esquerda'], ['center', 'Centro'], ['right', 'Direita']])}</div><div><label>Peso</label>${sele('weight', e.weight, [['400', 'Normal'], ['500', 'Médio'], ['600', 'Negrito']])}</div></div>
+      <div class="g"><div><label>Fonte</label>${sele('font', e.font, Object.entries(FONT_NAMES))}</div><div><label>Letras</label>${sele('caps', e.caps || '', [['', 'Normal'], ['1', 'MAIÚSCULAS']])}</div></div>`;
+    else if (e.type === 'image') h += `<button data-a="swap">Trocar imagem</button><label>Ajuste</label>${sele('fit', e.fit || 'cover', [['cover', 'Preencher'], ['contain', 'Conter']])}`;
+    else h += `<label>Cor</label><input type="color" data-k="${e.stroke ? 'stroke' : 'fill'}" value="${e.stroke || e.fill}" style="padding:2px;height:34px">`;
+  }
+  $('#panel').innerHTML = h;
+}
+let lazyT;
+$('#panel').oninput = (ev) => {
+  const t = ev.target, k = t.dataset.k, sk = t.dataset.s; if (!k && !sk) return;
+  const v = t.type === 'number' || t.type === 'range' ? +t.value : t.value;
+  if (k) selEl()[k] = v; else cur()[sk] = v;
+  if (sk === 'bg') cur().bgcss = '';
+  if (k) {
+    const e = selEl(), n = $('#cv').querySelector(`[data-id="${e.id}"]`); if (n) styleNode(n, e);
+    clearTimeout(lazyT); lazyT = setTimeout(() => { drawLayers(); drawThumb(); }, 400);
+  } else if (sk === 'dim') {
+    const o = $('#cv .ov'); if (o) o.style.opacity = v / 100;
+    clearTimeout(lazyT); lazyT = setTimeout(drawThumb, 400);
+  } else if (sk === 'bg') draw();
+  persist();
+};
+$('#panel').onclick = (ev) => { const a = ev.target.closest('[data-a]')?.dataset.a; if (a) act(a); };
+$('#layers').onclick = (ev) => { const id = ev.target.dataset.id; if (id) { sel = id; draw(); panel(); } };
+
+function act(a) {
+  const s = cur(), e = selEl(), i = e ? s.els.indexOf(e) : -1;
+  if (a === 'dup') { const c = { ...e, id: newId(), x: e.x + 30, y: e.y + 30 }; s.els.push(c); sel = c.id; }
+  else if (a === 'del') { s.els.splice(i, 1); sel = null; }
+  else if (a === 'front') s.els.push(...s.els.splice(i, 1));
+  else if (a === 'back') s.els.unshift(...s.els.splice(i, 1));
+  else if (a === 'sleft') { if (si > 0) { [slides[si - 1], slides[si]] = [slides[si], slides[si - 1]]; si--; } }
+  else if (a === 'sright') { if (si < slides.length - 1) { [slides[si + 1], slides[si]] = [slides[si], slides[si + 1]]; si++; } }
+  else if (a === 'sdup') { slides.splice(si + 1, 0, structuredClone(s)); si++; sel = null; }
+  else if (a === 'sdel') { if (slides.length < 2) return toast('O carrossel precisa de pelo menos 1 slide.', 1); slides.splice(si, 1); si = Math.min(si, slides.length - 1); sel = null; }
+  else if (a === 'bgup') return pick('bg');
+  else if (a === 'swap') return pick('swap');
+  else if (a === 'bgrm') s.image = '';
+  else if (a === 'copyp') { navigator.clipboard.writeText(s.image_prompt || ''); return toast('Prompt copiado. Cole no Gemini ou no Flow.'); }
+  else if (a === 'redo') {
+    const ts = s.els.filter((x) => x.type === 'text').sort((p, q) => q.size - p.size), t = ts[0], bo = ts.find((x) => x !== t && x.size >= 36 && x.size < t.size);
+    if (!t) return toast('Este slide não tem texto para refazer.', 1);
+    toast('Reescrevendo o slide…');
+    api('/api/slide/rewrite', { title: t.text, body: bo?.text || '', instruction: $('#rdI')?.value || '', theme: $('#ct').value, others: slides.filter((x) => x !== s).map((x) => x.els.filter((y) => y.type === 'text' && y.size >= 90).map((y) => y.text).join(' ')) })
+      .then((r) => { t.text = r.title; if (bo) bo.text = r.body; drawThumbs(); refresh(); persist(); toast('Slide refeito.'); }).catch((er) => toast(er.message, 1)); return;
+  }
+  else if (a === 'detach') {
+    if (!s.image) return;
+    const b = s.box || { x: 0, y: 0, w: 1080, h: 1350 }, im = { id: newId(), type: 'image', x: b.x, y: b.y, w: b.w, h: b.h, src: s.image, fit: 'cover', op: 100 };
+    const add = [im]; if (!s.box && (s.dim ?? 100) > 0) add.push({ id: newId(), type: 'rect', x: 0, y: 0, w: 1080, h: 1350, fill: '#000000', op: Math.round((s.dim ?? 100) * 0.45) });
+    s.els.unshift(...add); s.image = ''; s.box = null; sel = im.id; toast('Imagem solta: arraste, redimensione e gire como quiser.');
+  }
+  else if (a === 'fx2ai' || a === 'fx2aiall') {
+    const list = a === 'fx2ai' ? [s] : slides.filter((x) => x.els.some((y) => y.orb || y.band));
+    if (list.some((x) => !x.image_prompt)) return toast('Algum slide está sem prompt da imagem. Escreva o prompt primeiro.', 1);
+    list.forEach((x) => { x.els = x.els.filter((y) => !y.orb && !y.band); x.fx = false; x.image = ''; });
+    drawThumbs(); refresh(); persist(); toast('Gerando imagem com IA…');
+    genImages(list, true).then(() => { drawThumbs(); refresh(); persist(); }); return;
+  }
+  else if (a === 'genimg') {
+    if (!s.image_prompt) return toast('Escreva o prompt da imagem.', 1);
+    toast('Gerando imagem…'); makeImage(s).then(() => { drawThumbs(); refresh(); persist(); }).catch((er) => toast(er.message, 1)); return;
+  }
+  drawThumbs(); refresh(); persist();
+}
+async function genImages(list, force) {
+  const todo = list.filter((x) => x.image_prompt && (force || (!x.image && !x.fx))); let ok = 0, fail = 0, last = '';
+  for (let i = 0; i < todo.length; i++) {
+    toast(`Gerando imagem ${i + 1} de ${todo.length}…`);
+    try { await makeImage(todo[i]); ok++; drawThumbs(); refresh(); persist(); } catch (err) { fail++; last = err.message; if (fail >= 2) break; }
+  }
+  if (fail) toast(`${ok} imagem(ns) gerada(s). Erro: ${last}`, 1); else if (todo.length) toast(`${ok} imagem(ns) gerada(s).`);
+}
+const packImg = (url, max = 1600, q = 0.86, png = false) => new Promise((res) => {
+  const im = new Image(); im.onerror = () => res(url);
+  im.onload = () => { const k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.max(1, Math.round(im.width * k)); c.height = Math.max(1, Math.round(im.height * k)); const x = c.getContext('2d'); if (!png) { x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); } x.drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL(png ? 'image/png' : 'image/jpeg', q)); };
+  im.src = url;
+});
+const loadDims = (src) => new Promise((res) => { const im = new Image(); im.onload = () => res([im.width || 1, im.height || 1]); im.onerror = () => res([1, 1]); im.src = src; });
+const IMG_OPTS = [['auto', 'Automático (o do estilo escolhido)'], ['photo', 'Foto realista'], ['illustration', 'Desenho / ilustração (sem pessoas reais)'], ['3d', '3D estilizado'], ['minimal', 'Vetor minimalista'], ['watercolor', 'Aquarela'], ['none', 'Sem estilo extra']];
+const fillImgSel = (el) => { el.innerHTML = IMG_OPTS.map(([v, t]) => `<option value="${v}">${t}</option>`).join(''); };
+let curImg = { style: 'auto', styleId: '' };
+const makeImage = async (s) => {
+  const st = styles.find((x) => x.id === curImg.styleId), g = st?.guide, auto = curImg.style === 'auto';
+  const style = auto ? (g?.image_look ? 'none' : (st?.imageStyle || 'photo')) : curImg.style, hasChar = (st?.refs || []).length > 0;
+  const refs = hasChar ? st.refs : (auto && st && st.useThumbs === true ? (st.thumbs || []).slice(0, 3) : []);
+  const r = await api('/api/image', { prompt: s.image_prompt, style, look: auto ? (g?.image_look || '') : '', character: st?.character || '', refs, refsKind: hasChar ? 'character' : 'style', wide: !!s.box });
+  s.image = await packImg(r.image);
+};
+const pick = (m) => { fiMode = m; $('#fi').value = ''; $('#fi').click(); };
+$('#fi').onchange = () => {
+  const f = $('#fi').files[0]; if (!f) return; const r = new FileReader();
+  r.onload = async () => {
+    const s = cur(), png = f.type === 'image/png', data = f.type === 'image/svg+xml' ? r.result : await packImg(r.result, 1600, 0.86, png && fiMode !== 'bg');
+    if (fiMode === 'bg') s.image = data;
+    else if (fiMode === 'swap') selEl().src = data;
+    else { const e = { id: newId(), type: 'image', x: 300, y: 300, w: 480, h: 600, src: data, fit: 'cover', op: 100 }; s.els.push(e); sel = e.id; }
+    drawThumbs(); refresh(); persist();
+  };
+  r.readAsDataURL(f);
+};
+const brandAssets = () => { const st = styles.find((x) => x.id === curImg.styleId); return (st ? [st] : styles).flatMap((x) => x.assets || []); };
+function toggleTray() {
+  const t = $('#tray'); if (t.style.display === 'flex') { t.style.display = 'none'; return; }
+  const list = brandAssets(); t.style.display = 'flex';
+  t.innerHTML = list.length ? list.map((a, i) => `<img data-i="${i}" src="${a.src}" title="${esc(a.name)}" style="height:56px;width:56px;object-fit:contain;border:1px solid #ddd;border-radius:8px;cursor:pointer;background:repeating-conic-gradient(#eee 0 25%,#fff 0 50%) 0 0/14px 14px">`).join('') : '<span class="sub" style="margin:0">Nenhum elemento ainda. Adicione em Estilos → Elementos da identidade visual.</span>';
+  t.onclick = async (ev) => {
+    const i = ev.target.dataset.i; if (i === undefined) return; const a = list[+i], [nw, nh] = await loadDims(a.src), w = 280;
+    const e = { id: newId(), type: 'image', x: 400, y: 200, w, h: Math.round(w * nh / nw), src: a.src, fit: 'contain', op: 100 }; cur().els.push(e); sel = e.id; drawThumbs(); refresh(); persist();
+  };
+}
+document.querySelector('.tools').onclick = (ev) => {
+  const t = ev.target.dataset.add; if (!t) return; if (t === 'image') return pick('new'); if (t === 'assets') return toggleTray();
+  const b = { id: newId(), op: 100, x: 340, y: 560 };
+  const e = t === 'text' ? { ...b, type: 'text', w: 500, text: 'Novo texto', size: 64, color: cur().bg === 'light' ? '#1c1b19' : '#ffffff', align: 'left', weight: '600', font: 'sans' } : { ...b, type: t, w: 400, h: 400, fill: '#3d6bff' };
+  cur().els.push(e); sel = e.id; drawThumbs(); refresh(); persist();
+};
+
+// arrastar, redimensionar e editar texto no slide
+$('#cv').onpointerdown = (ev) => {
+  const n = ev.target.closest('.e'), hd = ev.target.closest('.hd');
+  if (editing) { if (n && n.dataset.id === editing) return; document.activeElement.blur(); }
+  if (!n) { if (sel) { sel = null; refresh(); } return; }
+  const e = cur().els.find((x) => x.id === n.dataset.id); if (!e) return;
+  const changed = sel !== e.id; sel = e.id; if (changed) { draw(); panel(); }
+  const mode = hd ? 'rs' : 'mv', sx = ev.clientX, sy = ev.clientY, o = { x: e.x, y: e.y, w: e.w, h: e.h };
+  const mv = (m) => {
+    const dx = (m.clientX - sx) / K, dy = (m.clientY - sy) / K;
+    if (mode === 'mv') { e.x = Math.round(o.x + dx); e.y = Math.round(o.y + dy); } else {
+      const c = hd.dataset.c;
+      if (c.includes('e')) e.w = Math.max(40, Math.round(o.w + dx));
+      if (c.includes('w')) { const nw = Math.max(40, Math.round(o.w - dx)); e.x = o.x + (o.w - nw); e.w = nw; }
+      if (e.type !== 'text') {
+        if (c.includes('s')) e.h = Math.max(40, Math.round(o.h + dy));
+        if (c.includes('n')) { const nh = Math.max(40, Math.round(o.h - dy)); e.y = o.y + (o.h - nh); e.h = nh; }
+      }
+    }
+    const node = $('#cv').querySelector(`[data-id="${e.id}"]`); if (node) place(node, e);
+  };
+  const up = () => { removeEventListener('pointermove', mv); removeEventListener('pointerup', up); drawThumb(); panel(); persist(); };
+  addEventListener('pointermove', mv); addEventListener('pointerup', up); ev.preventDefault();
+};
+$('#cv').ondblclick = (ev) => {
+  const n = ev.target.closest('.e'); if (!n) return; const e = cur().els.find((x) => x.id === n.dataset.id); if (!e || e.type !== 'text') return;
+  editing = e.id; sel = e.id; draw();
+  const m = $('#cv').querySelector(`[data-id="${e.id}"]`); m.contentEditable = 'true'; m.focus();
+  const r = getSelection(); r.selectAllChildren(m); r.collapseToEnd();
+  m.onkeydown = (k) => { if (k.key === 'Escape') m.blur(); };
+  m.onblur = () => { e.text = m.innerText.replace(/\n$/, ''); editing = null; drawThumbs(); refresh(); persist(); };
+};
+addEventListener('keydown', (ev) => {
+  if ($('#ed').style.display === 'none' || editing || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
+  if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'z') { undo(ev.shiftKey ? 1 : -1); ev.preventDefault(); return; }
+  if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'y') { undo(1); ev.preventDefault(); return; }
+  const e = selEl(); if (!e) return;
+  if (ev.key === 'Delete' || ev.key === 'Backspace') { act('del'); ev.preventDefault(); }
+  else if ((ev.ctrlKey || ev.metaKey) && ev.key === 'd') { act('dup'); ev.preventDefault(); }
+  else if (ev.key.startsWith('Arrow')) { const d = ev.shiftKey ? 10 : 1; if (ev.key === 'ArrowLeft') e.x -= d; if (ev.key === 'ArrowRight') e.x += d; if (ev.key === 'ArrowUp') e.y -= d; if (ev.key === 'ArrowDown') e.y += d; draw(); panel(); persist(); ev.preventDefault(); }
+});
+addEventListener('resize', () => { if ($('#ed').style.display !== 'none') draw(); });
+
+$('#addsl').onclick = () => { const ns = toSlide({ title: 'Novo slide', body: 'Escreva aqui o texto do slide.' }, si + 1, slides.length + 1, cur().bg), t0 = cur().els.find((e) => e.type === 'text'), r0 = cur().els.find((e) => e.type === 'rect'); ns.bgcss = cur().bgcss; ns.els.forEach((e) => { if (e.type === 'text' && t0) { e.color = t0.color; e.font = t0.font; } if (e.type === 'rect' && r0) e.fill = r0.fill; }); slides.splice(si + 1, 0, ns); si++; sel = null; drawThumbs(); refresh(); persist(); };
+$('#cap').oninput = persist;
+$('#edback').onclick = async () => { clearTimeout(saveT); await persistNow(); $('#ed').style.display = 'none'; };
+
+async function slidePng(i) {
+  const w = document.createElement('div'); w.style.cssText = 'position:fixed;left:-99999px;top:0'; const n = buildSlide(slides[i], false); w.append(n); document.body.append(w);
+  try { return await htmlToImage.toPng(n, { width: 1080, height: 1350, pixelRatio: 1 }); } finally { w.remove(); }
+}
+const baixar = (url, nome) => { const a = document.createElement('a'); a.href = url; a.download = nome; a.click(); };
+const nomeSlide = (i) => `slide-${String(i + 1).padStart(2, '0')}.png`;
+async function exportPng(i) { try { baixar(await slidePng(i), nomeSlide(i)); } catch (e) { toast('Não consegui gerar o PNG: ' + e.message, 1); } }
+$('#dlzip').onclick = (e) => busy(e.target, 'Gerando ZIP…', async () => {
+  if (!window.JSZip) return toast('Não consegui carregar o gerador de ZIP. Verifique a internet.', 1);
+  const zip = new JSZip(); for (let i = 0; i < slides.length; i++) zip.file(nomeSlide(i), (await slidePng(i)).split(',')[1], { base64: true });
+  zip.file('legenda.txt', $('#cap').value || ''); const url = URL.createObjectURL(await zip.generateAsync({ type: 'blob' }));
+  baixar(url, (($('#ct').value || 'carrossel').replace(/[^\w\-]+/g, '-').slice(0, 40) || 'carrossel') + '.zip'); setTimeout(() => URL.revokeObjectURL(url), 5000);
+});
+
+// ---------- Exportar SVG editável (Figma) ----------
+const xe = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const rotT = (e, h) => (e.rot ? ` transform="rotate(${e.rot} ${e.x + e.w / 2} ${e.y + h / 2})"` : '');
+function textLines(n) {
+  const tn = n.firstChild; if (!tn || tn.nodeType !== 3) return [];
+  const base = n.parentNode.getBoundingClientRect(), range = document.createRange(), out = []; let cur = null;
+  for (const m of tn.data.matchAll(/\S+/g)) {
+    range.setStart(tn, m.index); range.setEnd(tn, m.index + m[0].length);
+    const r = range.getBoundingClientRect(), key = Math.round(r.top - base.top);
+    if (!cur || Math.abs(cur.key - key) > r.height * 0.5) { cur = { key, top: r.top - base.top, h: r.height, left: r.left - base.left, right: r.right - base.left, words: [] }; out.push(cur); }
+    cur.words.push(m[0]); cur.right = r.right - base.left;
+  }
+  return out;
+}
+function slideSvg(i) {
+  const s = slides[i], dark = (s.bg || 'dark') === 'dark', W = 1080, H = 1350;
+  const wrap = document.createElement('div'); wrap.style.cssText = 'position:fixed;left:-99999px;top:0'; const dom = buildSlide(s, false); wrap.append(dom); document.body.append(wrap);
+  const defs = [], body = [];
+  try {
+    const gc = (s.bgcss || '').match(/#[0-9a-f]{6}/gi);
+    const c1 = gc?.[0] || (dark ? '#050816' : '#f4f1ea'), c2 = gc?.[1] || (dark ? '#0a1650' : '#f4f1ea');
+    defs.push(`<linearGradient id="bg" x1="0.2" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>`);
+    body.push(`<rect id="Fundo" width="${W}" height="${H}" fill="url(#bg)"/>`);
+    if (dark && !s.bgcss) { defs.push('<radialGradient id="gl" gradientUnits="userSpaceOnUse" cx="972" cy="108" r="700"><stop offset="0" stop-color="#3d6bff" stop-opacity="0.45"/><stop offset="1" stop-color="#3d6bff" stop-opacity="0"/></radialGradient>'); body.push(`<rect id="Brilho" width="${W}" height="${H}" fill="url(#gl)"/>`); }
+    if (s.image && s.box) {
+      const b = s.box; defs.push(`<clipPath id="cpb"><rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}"/></clipPath>`);
+      body.push(`<image id="Imagem" href="${s.image}" x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" preserveAspectRatio="xMidYMid slice" clip-path="url(#cpb)"/>`);
+    } else if (s.image) {
+      const ov = dark ? '5,8,22' : '244,241,234';
+      defs.push(`<linearGradient id="ov" x1="0" y1="1" x2="0" y2="0"><stop offset="0.1" stop-color="rgb(${ov})" stop-opacity="0.94"/><stop offset="1" stop-color="rgb(${ov})" stop-opacity="0.25"/></linearGradient>`);
+      body.push(`<image id="Imagem de fundo" href="${s.image}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"/>`, `<rect id="Escurecimento" width="${W}" height="${H}" fill="url(#ov)" opacity="${(s.dim ?? 100) / 100}"/>`);
+    }
+    (s.els || []).forEach((e, k) => {
+      const op = (e.op ?? 100) / 100;
+      if (e.type === 'rect' && e.band) { defs.push(`<linearGradient id="bd${k}"><stop offset="0" stop-color="${e.fill}" stop-opacity="0"/><stop offset="0.18" stop-color="${e.fill}"/><stop offset="0.5" stop-color="#fff"/><stop offset="0.82" stop-color="${e.fill}"/><stop offset="1" stop-color="${e.fill}" stop-opacity="0"/></linearGradient>`); body.push(`<rect id="Faixa neon ${k + 1}" x="${e.x}" y="${e.y}" width="${e.w}" height="${e.h}" fill="url(#bd${k})" opacity="${op}"${rotT(e, e.h)}/>`); }
+      else if (e.type === 'ellipse' && e.orb) { const cx = e.x + e.w / 2, cy = e.y + e.h / 2; defs.push(`<filter id="bl${k}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="45"/></filter><radialGradient id="ob${k}" cx="0.32" cy="0.26" r="0.8"><stop offset="0" stop-color="#fff" stop-opacity="0.9"/><stop offset="0.09" stop-color="#fff" stop-opacity="0.28"/><stop offset="0.36" stop-color="${e.fill}"/><stop offset="1" stop-color="${e.fill2}"/></radialGradient>`); body.push(`<ellipse id="Brilho esfera ${k + 1}" cx="${cx}" cy="${cy}" rx="${e.w / 2}" ry="${e.h / 2}" fill="${e.fill}" opacity="0.5" filter="url(#bl${k})"/>`, `<ellipse id="Esfera de vidro ${k + 1}" cx="${cx}" cy="${cy}" rx="${e.w / 2 - 1}" ry="${e.h / 2 - 1}" fill="url(#ob${k})" stroke="#fff" stroke-opacity="0.35" stroke-width="2"/>`); }
+      else if (e.type === 'rect') { const sw = e.stroke ? (e.sw || 4) : 0; body.push(`<rect id="Retângulo ${k + 1}" x="${e.x + sw / 2}" y="${e.y + sw / 2}" width="${e.w - sw}" height="${e.h - sw}" rx="${e.r || 0}" fill="${e.stroke ? 'none' : e.fill}"${e.stroke ? ` stroke="${e.stroke}" stroke-width="${sw}"` : ''} opacity="${op}"${rotT(e, e.h)}/>`); }
+      else if (e.type === 'ellipse') { if (e.blur) defs.push(`<filter id="bl${k}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="${e.blur}"/></filter>`); body.push(`<ellipse id="Elipse ${k + 1}" cx="${e.x + e.w / 2}" cy="${e.y + e.h / 2}" rx="${e.w / 2}" ry="${e.h / 2}" fill="${e.fill}" opacity="${op}"${e.blur ? ` filter="url(#bl${k})"` : ''}${rotT(e, e.h)}/>`); }
+      else if (e.type === 'image') {
+        defs.push(`<clipPath id="cp${k}"><rect x="${e.x}" y="${e.y}" width="${e.w}" height="${e.h}"/></clipPath>`);
+        body.push(`<image id="Imagem ${k + 1}" href="${e.src}" x="${e.x}" y="${e.y}" width="${e.w}" height="${e.h}" preserveAspectRatio="xMidYMid ${e.fit === 'contain' ? 'meet' : 'slice'}" clip-path="url(#cp${k})" opacity="${op}"${rotT(e, e.h)}/>`);
+      } else if (e.type === 'text') {
+        const n = dom.querySelector(`[data-id="${e.id}"]`); if (!n) return;
+        n.style.transform = ''; const lines = textLines(n); if (!lines.length) return;
+        const anc = e.align === 'center' ? 'middle' : e.align === 'right' ? 'end' : 'start', x = e.align === 'center' ? e.x + e.w / 2 : e.align === 'right' ? e.x + e.w : e.x;
+        const th = n.getBoundingClientRect().height, fam = ({ serif: "Georgia, 'Times New Roman', serif", display: "Anton, Impact, 'Arial Narrow', sans-serif", grotesk: "'Space Grotesk', Inter, sans-serif" })[e.font] || 'Inter, Arial, sans-serif';
+        const ts = lines.map((l) => `<tspan x="${x}" y="${Math.round(l.top + l.h * 0.8)}">${xe(e.caps ? l.words.join(' ').toUpperCase() : l.words.join(' '))}</tspan>`).join('');
+        body.push(`<text id="${xe((e.text || 'Texto').slice(0, 30))}" font-family="${fam}" font-size="${e.size}" font-weight="${e.weight}" fill="${e.color}" text-anchor="${anc}" opacity="${op}"${rotT(e, th)}>${ts}</text>`);
+      }
+    });
+  } finally { wrap.remove(); }
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">\n<defs>${defs.join('')}</defs>\n${body.join('\n')}\n</svg>`;
+}
+const nomeSvg = (i) => `slide-${String(i + 1).padStart(2, '0')}.svg`;
+$('#dlsvg').onclick = (e) => busy(e.target, 'Gerando SVG…', async () => {
+  if (!window.JSZip) return toast('Não consegui carregar o gerador de ZIP. Verifique a internet.', 1);
+  const zip = new JSZip(); for (let i = 0; i < slides.length; i++) zip.file(nomeSvg(i), slideSvg(i));
+  const url = URL.createObjectURL(await zip.generateAsync({ type: 'blob' }));
+  baixar(url, (($('#ct').value || 'carrossel').replace(/[^\w\-]+/g, '-').slice(0, 40) || 'carrossel') + '-figma.zip'); setTimeout(() => URL.revokeObjectURL(url), 5000);
+  toast('ZIP gerado. Extraia e arraste os arquivos .svg para dentro do Figma.');
+});
+$('#edImgStyle').onchange = () => { curImg.style = $('#edImgStyle').value; persist(); };
+$('#edFx').onclick = () => { if (!slides.some((x) => x.els.some((y) => y.orb || y.band))) return toast('Nenhum slide com efeitos (esferas/faixa).', 1); if (confirm('Trocar as esferas e a faixa de TODOS os slides por imagens geradas pela IA?')) act('fx2aiall'); };
+$('#edImgs').onclick = (e) => { const had = slides.some((x) => x.image_prompt && x.image), redo = had && confirm('Alguns slides já têm imagem.\n\nOK = refazer TODAS as imagens\nCancelar = gerar só as que faltam'); busy(e.target, 'Gerando…', () => genImages(slides, redo)); };
+$('#edUndo').onclick = () => undo(-1); $('#edRedo').onclick = () => undo(1);
+$('#edSt').onchange = () => { curMeta.status = $('#edSt').value; persist(); };
+$('#edDate').onchange = () => { curMeta.date = $('#edDate').value; persist(); };
+$('#edCap').onclick = () => { navigator.clipboard.writeText($('#cap').value); toast('Legenda copiada.'); };
+$('#edReel').onclick = (e) => busy(e.target, 'Criando roteiro…', async () => {
+  const txt = slides.map((s, i) => `${i + 1}. ` + s.els.filter((x) => x.type === 'text' && x.size >= 40).map((x) => x.text).join(' — ')).join('\n');
+  const title = $('#ct').value || 'Reel', level = $('#scL').value;
+  const r = await api('/api/script', { title, seconds: 45, level, pace, instruction: 'Transforme este carrossel em um roteiro de Reel, mantendo as ideias na mesma ordem:\n' + txt });
+  script = { id: Date.now().toString(36), title, seconds: 45, level, caption: r.caption || $('#cap').value, blocks: r.blocks.map((b) => ({ label: b.label || '', speech: b.speech || '', visual: b.visual || '', scene_prompt: b.scene_prompt || '' })) };
+  clearTimeout(saveT); await persistNow(); $('#ed').style.display = 'none'; go('scr'); await loadScripts();
+  $('#scT').value = title; $('#scCap').value = script.caption; renderScript(); saveScr(); toast('Roteiro criado a partir do carrossel.');
+});
+$('#dlone').onclick = () => exportPng(si);
+$('#dlall').onclick = async () => { for (let i = 0; i < slides.length; i++) { await exportPng(i); await new Promise((r) => setTimeout(r, 400)); } };
+
+fillImgSel($('#cis')); fillImgSel($('#edImgStyle'));
+$('#cf').onchange = () => { $('#cnw').style.display = $('#cf').value === 'post' ? 'none' : ''; $('#gen').textContent = $('#cf').value === 'post' ? 'Gerar post' : 'Gerar carrossel'; };
+$('#gen').onclick = (e) => busy(e.target, 'Escrevendo slides…', async () => {
+  const title = $('#ct').value.trim(); if (!title) return toast('Escolha ou escreva uma ideia.', 1);
+  const maxImages = +$('#ci').value, sv = $('#cs').value, g = sv.startsWith('s:') ? styles.find((x) => x.id === sv.slice(2))?.guide : null, theme = g ? (g.dark ? 'dark' : 'light') : sv;
+  const r = await api('/api/carousel', { title, hook: current?.title === title ? current.hook : '', count: $('#cf').value === 'post' ? 1 : +$('#cn').value, maxImages, instruction: $('#cx').value });
+  const n = r.slides.length;
+  slides = r.slides.map((o, i) => toSlide({ ...o, image_prompt: o.image_prompt || [o.title, o.body].filter(Boolean).join('. ') + '. No text.' }, i, n, theme, g));
+  curImg = { style: $('#cis').value, styleId: sv.startsWith('s:') ? sv.slice(2) : '' };
+  curId = Date.now().toString(36); curMeta = { status: 'Rascunho', date: '' }; $('#cap').value = r.caption || ''; si = 0; openEditor(); persist();
+  if ($('#cas').value === '1') {
+    const list = brandAssets();
+    if (!list.length) toast('Esse estilo ainda não tem elementos da marca. Adicione em Estilos.', 1);
+    else { for (let i = 0; i < slides.length; i++) { const a = list[i % list.length], [nw, nh] = await loadDims(a.src), w = 190 + (i % 3) * 25; slides[i].els.push({ id: newId(), type: 'image', x: (slides[i].els.find((e) => e.type === 'text' && e.size >= 60)?.align === 'right') ? 90 : 1080 - 90 - w, y: 60 + (i % 3) * 18, w, h: Math.round(w * nh / nw), src: a.src, fit: 'contain', op: 100, rot: i % 2 ? -10 : 8 }); } drawThumbs(); refresh(); persist(); }
+  }
+  if (maxImages) await genImages(slides.slice(0, maxImages));
+});
+
+// ---------- Biblioteca ----------
+function openCar(c) {
+  curImg = { style: c.imgStyle || 'auto', styleId: c.styleId || '' }; curId = c.id; curMeta = { status: c.status || 'Rascunho', date: c.date || '' }; slides = c.slides.map((s, i) => (s.els ? s : toSlide(s, i, c.slides.length, c.style || 'dark')));
+  $('#ct').value = c.title; $('#cap').value = c.caption || ''; si = 0; openEditor(); $('#saved').textContent = '';
+}
+async function loadLib() {
+  const l = await api('/api/carousels');
+  $('#liblist').innerHTML = l.length ? '' : '<p class="sub">Nada salvo ainda. Gere um carrossel e ele aparece aqui sozinho.</p>';
+  l.forEach((c) => {
+    const d = document.createElement('div'); d.className = 'idea';
+    d.innerHTML = `<div class="t"><b>${esc(c.title)}</b><small>${c.count} slides · ${esc(c.status || 'Rascunho')}${c.date ? ' · publicar em ' + esc(c.date.split('-').reverse().join('/')) : ''} · ${new Date(c.updated).toLocaleString('pt-BR')}</small></div><button class="pri">Abrir</button><button>Excluir</button>`;
+    d.children[1].onclick = async () => openCar(await api('/api/carousels/open', { id: c.id }));
+    d.children[2].onclick = async () => { if (!confirm('Excluir este carrossel?')) return; await api('/api/carousels/delete', { id: c.id }); loadLib(); };
+    $('#liblist').append(d);
+  });
+}
+
+// ---------- Roteiros ----------
+let pace = 2.6, script = null, scripts = [], scT, scIdea = null, tpRun = false, tpMul = 1, tpLast = 0, tpPos = 0, tpSize = 64;
+const words = (t) => ((t || '').trim().match(/\S+/g) || []).length;
+const fmt = (s) => { s = Math.round(s); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const totalWords = () => script.blocks.reduce((a, b) => a + words(b.speech), 0);
+async function loadScripts() { scripts = await api('/api/scripts'); renderScList(); }
+function renderScList() {
+  $('#scList').innerHTML = scripts.length ? '' : '<p class="sub">Nenhum roteiro salvo ainda.</p>';
+  scripts.forEach((x) => {
+    const w = x.blocks.reduce((a, b) => a + words(b.speech), 0), d = document.createElement('div'); d.className = 'idea';
+    d.innerHTML = `<div class="t"><b>${esc(x.title)}</b><small>${w} palavras · ${fmt(w / pace)} · ${new Date(x.updated || Date.now()).toLocaleString('pt-BR')}</small></div><button class="pri">Abrir</button><button>Excluir</button>`;
+    d.children[1].onclick = () => { script = x; $('#scT').value = x.title; $('#scCap').value = x.caption || ''; renderScript(); window.scrollTo(0, 0); };
+    d.children[2].onclick = async () => { if (!confirm('Excluir este roteiro?')) return; scripts = scripts.filter((y) => y.id !== x.id); await api('/api/scripts', { scripts }); if (script?.id === x.id) { script = null; $('#scOut').style.display = 'none'; } renderScList(); };
+    $('#scList').append(d);
+  });
+}
+function saveScr() {
+  clearTimeout(scT); $('#scSaved').textContent = 'Salvando…';
+  scT = setTimeout(async () => {
+    try {
+      script.updated = Date.now(); const i = scripts.findIndex((x) => x.id === script.id); if (i < 0) scripts.unshift(script); else scripts[i] = script;
+      await api('/api/scripts', { scripts }); renderScList(); $('#scSaved').textContent = 'Salvo ✓';
+    } catch (e) { $('#scSaved').textContent = ''; toast(e.message, 1); }
+  }, 700);
+}
+function stats() {
+  script.blocks.forEach((b, i) => { const el = $('#scBlocks').children[i]?.querySelector('[data-t]'); if (el) el.textContent = `${words(b.speech)} palavras · ${fmt(words(b.speech) / pace)}`; });
+  const w = totalWords(); $('#scStats').textContent = `${w} palavras · ${fmt(w / pace)} no seu ritmo (${pace} palavras/s)`;
+}
+function renderScript() {
+  $('#scOut').style.display = 'block'; $('#scBlocks').innerHTML = '';
+  script.blocks.forEach((b, i) => {
+    const d = document.createElement('div'); d.className = 'sec';
+    d.innerHTML = `<h3>${esc(b.label || 'Bloco ' + (i + 1))} <span class="ok" data-t></span></h3>
+      <label>Fala</label><textarea data-f="speech" style="min-height:90px">${esc(b.speech)}</textarea>
+      <label>Cena: o que aparece na tela</label><textarea data-f="visual" style="min-height:56px">${esc(b.visual)}</textarea>
+      <label>Prompt da cena (para Flow ou Gemini)</label><textarea data-f="scene_prompt" style="min-height:56px">${esc(b.scene_prompt)}</textarea>
+      <div class="acts"><button data-c>Copiar prompt da cena</button><button data-x>Excluir bloco</button></div>`;
+    d.oninput = (e) => { const f = e.target.dataset.f; if (!f) return; b[f] = e.target.value; stats(); saveScr(); };
+    d.querySelector('[data-c]').onclick = () => { navigator.clipboard.writeText(b.scene_prompt || b.visual || ''); toast('Prompt copiado. Cole no Flow ou no Gemini.'); };
+    d.querySelector('[data-x]').onclick = () => { if (script.blocks.length < 2) return toast('O roteiro precisa de pelo menos 1 bloco.', 1); script.blocks.splice(i, 1); renderScript(); saveScr(); };
+    $('#scBlocks').append(d);
+  });
+  stats();
+}
+$('#scGen').onclick = (e) => busy(e.target, 'Escrevendo roteiro…', async () => {
+  const title = $('#scT').value.trim(); if (!title) return toast('Escolha uma ideia ou escreva o tema.', 1);
+  const seconds = +$('#scD').value, level = $('#scL').value;
+  const r = await api('/api/script', { title, hook: scIdea?.title === title ? scIdea.hook : '', seconds, level, pace, instruction: $('#scX').value });
+  script = { id: Date.now().toString(36), title, seconds, level, caption: r.caption || '', blocks: r.blocks.map((b) => ({ label: b.label || '', speech: b.speech || '', visual: b.visual || '', scene_prompt: b.scene_prompt || '' })) };
+  $('#scCap').value = script.caption; renderScript(); saveScr();
+});
+$('#scAdd').onclick = () => { script.blocks.push({ label: 'Novo bloco', speech: '', visual: '', scene_prompt: '' }); renderScript(); saveScr(); };
+$('#scCap').oninput = () => { script.caption = $('#scCap').value; saveScr(); };
+$('#scCopy').onclick = () => { navigator.clipboard.writeText(script.blocks.map((b) => `${b.label}\n${b.speech}`).join('\n\n')); toast('Roteiro copiado.'); };
+$('#scCapCopy').onclick = () => { navigator.clipboard.writeText($('#scCap').value); toast('Legenda copiada.'); };
+
+// teleprompter
+function tpFrame(t) {
+  if (!tpRun) return; const el = $('#tpt'), dur = Math.max(5, totalWords() / pace);
+  tpPos += ((el.scrollHeight - el.clientHeight) / dur) * tpMul * ((t - tpLast) / 1000); tpLast = t; el.scrollTop = tpPos;
+  if (tpPos >= el.scrollHeight - el.clientHeight) { tpRun = false; $('#tpGo').textContent = 'Reiniciar'; return; }
+  requestAnimationFrame(tpFrame);
+}
+$('#scTp').onclick = () => {
+  $('#tpt').innerHTML = script.blocks.filter((b) => b.speech.trim()).map((b) => `<p style="margin:0 0 .9em">${esc(b.speech)}</p>`).join('');
+  $('#tpt').style.fontSize = tpSize + 'px'; $('#tp').style.display = 'block'; $('#tpt').scrollTop = tpPos = 0; tpRun = false; $('#tpGo').textContent = 'Iniciar';
+};
+$('#tpGo').onclick = () => {
+  if (tpRun) { tpRun = false; $('#tpGo').textContent = 'Continuar'; return; }
+  if ($('#tpGo').textContent === 'Reiniciar') $('#tpt').scrollTop = tpPos = 0;
+  tpRun = true; $('#tpGo').textContent = 'Pausar'; tpLast = performance.now(); requestAnimationFrame(tpFrame);
+};
+$('#tpt').onwheel = () => setTimeout(() => (tpPos = $('#tpt').scrollTop));
+$('#tpFast').onclick = () => (tpMul = Math.min(3, tpMul + 0.15));
+$('#tpSlow').onclick = () => (tpMul = Math.max(0.3, tpMul - 0.15));
+$('#tpPlus').onclick = () => { tpSize = Math.min(140, tpSize + 8); $('#tpt').style.fontSize = tpSize + 'px'; };
+$('#tpMinus').onclick = () => { tpSize = Math.max(32, tpSize - 8); $('#tpt').style.fontSize = tpSize + 'px'; };
+$('#tpX').onclick = () => { tpRun = false; $('#tp').style.display = 'none'; };
+
+// ---------- Estilos ----------
+let styles = [];
+async function loadStyles() { styles = await api('/api/styles'); fillStyleSelect(); renderStyles(); }
+function fillStyleSelect() {
+  const old = $('#cs').value;
+  $('#cs').innerHTML = '<option value="dark">Escuro</option><option value="light">Claro</option>' + styles.map((x) => `<option value="s:${x.id}">${esc(x.name)}</option>`).join('');
+  const d = styles.find((x) => x.isDefault); $('#cs').value = d ? 's:' + d.id : (['dark', 'light'].includes(old) ? old : 'dark');
+}
+const dot = (c) => `<span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:${c};border:1px solid #ddd;margin-right:4px"></span>`;
+function renderStyles() {
+  $('#stList').innerHTML = styles.length ? '' : '<p class="sub">Nenhum estilo ainda. Crie o primeiro abaixo.</p>';
+  styles.forEach((x, i) => {
+    const g = x.guide, d = document.createElement('div'); d.className = 'sec';
+    d.innerHTML = `<div class="row" style="align-items:center"><h3 style="flex:1;margin:0">${esc(x.name)} ${x.isDefault ? '<span class="ok">· padrão</span>' : ''}</h3>
+      <button data-d>${x.isDefault ? 'Tirar do padrão' : 'Usar como padrão'}</button><button data-re>Reanalisar prints</button><button data-x>Excluir</button></div>
+      <div style="margin:10px 0">${dot(g.bg[0])}${dot(g.bg[1])}${dot(g.text)}${dot(g.accent)} <span class="sub" style="margin:0 0 0 6px">${FONT_NAMES[g.heading_font] || 'Sem serifa'}${g.title_caps ? ' · MAIÚSCULAS' : ''} · ${g.dark ? 'fundo escuro' : 'fundo claro'}</span></div>
+      <p class="sub" style="margin:0 0 10px">${esc(g.description)}</p>
+      <p class="sub" style="margin:0 0 10px;font-size:12px">${g.layouts ? 'Diagramação aprendida: ' + ['cover', 'content', 'cta'].map((k) => ({ cover: 'capa', content: 'meio', cta: 'final' }[k]) + ' = texto ' + ({ top: 'no topo', middle: 'no meio', bottom: 'embaixo' }[g.layouts[k].pos]) + ', ' + ({ full: 'imagem cheia', top: 'imagem em cima', bottom: 'imagem embaixo', none: 'sem imagem' }[g.layouts[k].img])).join('; ') : 'Este estilo foi criado antes: clique em Reanalisar prints para aprender a diagramação e o visual das imagens.'}</p>
+      <label>Como são as imagens deste estilo (em inglês; é enviado à IA de imagem)</label><textarea data-lk style="min-height:64px">${esc(g.image_look || '')}</textarea>
+      <label>Tipografia dos títulos (você manda; vale mesmo se a IA errar)</label>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+        <select data-mf style="width:auto"><option value="">Automático (IA)</option>${Object.entries(FONT_NAMES).map(([k, v]) => `<option value="${k}"${g.mFont === k ? ' selected' : ''}>${v}</option>`).join('')}</select>
+        <select data-ms style="width:auto"><option value="">Tamanho: automático</option>${[['m', 'Médio'], ['l', 'Grande'], ['xl', 'Muito grande'], ['xxl', 'Gigante']].map(([k, v]) => `<option value="${k}"${g.mSize === k ? ' selected' : ''}>${v}</option>`).join('')}</select>
+        <label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" data-mc style="width:auto"${g.mCaps ? ' checked' : ''}> MAIÚSCULAS</label>
+        <label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" data-mx style="width:auto"${g.mFx ? ' checked' : ''}> <b>Sem imagem de IA: só brilho de fundo + seus elementos da marca</b></label>
+        <label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" data-mg style="width:auto"${g.mGlow ? ' checked' : ''}> Brilho de fundo</label>
+      </div>
+      <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-fi style="width:auto"${g.forceImages ? ' checked' : ''}> Sempre gerar imagem em todos os slides (ignorar "sem imagem" aprendido dos prints)</label>
+      <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-ut style="width:auto"${x.useThumbs === true ? ' checked' : ''}> Enviar os prints como referência (NÃO recomendado: a IA tende a copiar o texto e o conteúdo dos prints)</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${(x.thumbs || []).map((t) => `<img src="${t}" style="height:110px;border-radius:6px;border:1px solid #eee">`).join('')}</div>
+      <div class="row" style="margin-top:12px;align-items:flex-end"><div><label>Estilo das imagens deste estilo</label><select data-is>${IMG_OPTS.slice(1, 6).map(([v, t]) => `<option value="${v}"${(x.imageStyle || 'photo') === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div><div style="flex:2"><label>Personagem (descrição em inglês, usada nos prompts)</label><input data-ch value="${esc(x.character || '')}" placeholder="Ex.: a smiling cartoon fox mascot with a blue scarf"></div></div>
+      <label>Personagens de referência (${(x.refs || []).length} de 3): a IA de imagem recebe essas imagens para manter o mesmo personagem</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${(x.refs || []).map((t, k) => `<span style="position:relative"><img src="${t}" style="height:90px;border-radius:6px;border:1px solid #eee"><button data-rr="${k}" style="position:absolute;top:2px;right:2px;padding:0 6px">×</button></span>`).join('')}<button data-ar>+ Adicionar personagem</button><input type="file" accept="image/*" hidden data-af></div>
+      <label style="margin-top:12px">Elementos da identidade visual (${(x.assets || []).length} de 12): ficam na bandeja "Elementos da marca" do editor</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${(x.assets || []).map((a, k) => `<span style="position:relative"><img src="${a.src}" title="${esc(a.name)}" style="height:64px;width:64px;object-fit:contain;border-radius:8px;border:1px solid #ddd;background:repeating-conic-gradient(#eee 0 25%,#fff 0 50%) 0 0/14px 14px"><button data-ra="${k}" style="position:absolute;top:-4px;right:-4px;padding:0 6px">×</button></span>`).join('')}<button data-aa>+ Adicionar elemento</button><input type="file" accept="image/png,image/svg+xml,image/webp,image/jpeg" multiple hidden data-aaf></div>`;
+    d.querySelectorAll('[data-ra]').forEach((b) => (b.onclick = async () => { x.assets.splice(+b.dataset.ra, 1); await api('/api/styles', { styles }); renderStyles(); }));
+    const aaf = d.querySelector('[data-aaf]'); d.querySelector('[data-aa]').onclick = () => aaf.click();
+    aaf.onchange = async () => { const room = 12 - (x.assets || []).length; if (room <= 0) return toast('Máximo de 12 elementos por estilo.', 1); x.assets = [...(x.assets || []), ...(await Promise.all([...aaf.files].slice(0, room).map(readAsset)))]; await api('/api/styles', { styles }); renderStyles(); };
+    d.querySelector('[data-lk]').onchange = async (ev) => { g.image_look = ev.target.value; await api('/api/styles', { styles }); };
+    const sv = async () => { await api('/api/styles', { styles }); };
+    d.querySelector('[data-mf]').onchange = (ev) => { g.mFont = ev.target.value; sv(); };
+    d.querySelector('[data-ms]').onchange = (ev) => { g.mSize = ev.target.value; sv(); };
+    d.querySelector('[data-mc]').onchange = (ev) => { g.mCaps = ev.target.checked; sv(); };
+    d.querySelector('[data-mx]').onchange = (ev) => { g.mFx = ev.target.checked; sv(); };
+    d.querySelector('[data-mg]').onchange = (ev) => { g.mGlow = ev.target.checked; sv(); };
+    d.querySelector('[data-fi]').onchange = async (ev) => { g.forceImages = ev.target.checked; await api('/api/styles', { styles }); };
+    d.querySelector('[data-ut]').onchange = async (ev) => { x.useThumbs = ev.target.checked; await api('/api/styles', { styles }); };
+    d.querySelector('[data-re]').onclick = (ev) => busy(ev.target, 'Analisando…', async () => { await api('/api/styles/reanalyze', { id: x.id }); await loadStyles(); toast('Estilo reanalisado: diagramação e visual das imagens atualizados.'); });
+    d.querySelector('[data-is]').onchange = async (ev) => { x.imageStyle = ev.target.value; await api('/api/styles', { styles }); };
+    d.querySelector('[data-ch]').onchange = async (ev) => { x.character = ev.target.value; await api('/api/styles', { styles }); };
+    d.querySelectorAll('[data-rr]').forEach((b) => (b.onclick = async () => { x.refs.splice(+b.dataset.rr, 1); await api('/api/styles', { styles }); renderStyles(); }));
+    const af = d.querySelector('[data-af]'); d.querySelector('[data-ar]').onclick = () => { if ((x.refs || []).length >= 3) return toast('Máximo de 3 personagens por estilo.', 1); af.click(); };
+    af.onchange = async () => { if (!af.files[0]) return; x.refs = [...(x.refs || []), await shrink(af.files[0], 768)]; await api('/api/styles', { styles }); renderStyles(); };
+    d.querySelector('[data-d]').onclick = async () => { const on = !x.isDefault; styles.forEach((y) => (y.isDefault = false)); x.isDefault = on; await api('/api/styles', { styles }); fillStyleSelect(); renderStyles(); };
+    d.querySelector('[data-x]').onclick = async () => { if (!confirm('Excluir este estilo?')) return; styles.splice(i, 1); await api('/api/styles', { styles }); fillStyleSelect(); renderStyles(); };
+    $('#stList').append(d);
+  });
+}
+const readAsset = (f) => new Promise((res, rej) => { const r = new FileReader(); r.onerror = rej; r.onload = async () => res({ name: f.name.replace(/\.[^.]+$/, ''), src: f.type === 'image/svg+xml' ? r.result : await packImg(r.result, 512, 0.9, true) }); r.readAsDataURL(f); });
+const shrink = (file, mx) => new Promise((res, rej) => {
+  const r = new FileReader(); r.onerror = rej;
+  r.onload = () => { const im = new Image(); im.onerror = rej; im.onload = () => { const k = Math.min(1, (mx || 640) / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', 0.72)); }; im.src = r.result; };
+  r.readAsDataURL(file);
+});
+$('#stCreate').onclick = (e) => busy(e.target, 'Analisando os prints…', async () => {
+  const files = [...$('#stFiles').files]; if (!files.length) return toast('Escolha os prints do estilo.', 1);
+  if (!$('#stName').value.trim()) return toast('Dê um nome ao estilo.', 1);
+  const images = await Promise.all(files.slice(0, 12).map((f) => shrink(f)));
+  const refs = await Promise.all([...$('#stRefs').files].slice(0, 3).map((f) => shrink(f, 768)));
+  const assets = await Promise.all([...$('#stAssets').files].slice(0, 12).map(readAsset));
+  await api('/api/styles/analyze', { name: $('#stName').value, images, note: $('#stNote').value, isDefault: $('#stDef').checked, refs, assets });
+  $('#stFiles').value = ''; $('#stRefs').value = ''; $('#stAssets').value = ''; $('#stName').value = ''; $('#stNote').value = ''; await loadStyles(); toast('Estilo criado. Ele já aparece na lista de estilos em Carrosséis.');
+});
+
+// ---------- Radar ----------
+async function loadRadar() {
+  const r = await api('/api/radar');
+  $('#rdInfo').textContent = r.last ? `Última atualização: ${new Date(r.last).toLocaleString('pt-BR')}${r.msg ? ' · ' + r.msg : ''}` : 'Ainda não rodou.';
+  $('#rdList').innerHTML = (r.items || []).length ? '' : '<p class="sub">Nenhuma notícia captada ainda. Clique em Atualizar agora.</p>';
+  (r.items || []).forEach((i) => { const d = document.createElement('div'); d.className = 'idea'; d.innerHTML = `<div class="t"><a href="${esc(i.link)}" target="_blank" rel="noopener"><b>${esc(i.title)}</b></a><small>${esc(i.source || '')} ${esc(i.date || '')}</small></div>`; $('#rdList').append(d); });
+}
+$('#rdRun').onclick = (e) => busy(e.target, 'Buscando e analisando…', async () => {
+  const r = await api('/api/radar/run', {}); ideas = await api('/api/ideas'); renderIdeas(); await loadRadar(); toast(`${r.added} ideias novas em Ideias.`);
+});
+
+// ---------- Configurações ----------
+const F = ['who', 'audience', 'positioning', 'tone', 'phrases', 'topics', 'blocked', 'handle', 'level', 'pace', 'radar', 'radarblock', 'feeds', 'auto', 'people'];
+const PROV = ['gemini', 'groq', 'openrouter', 'xai', 'anthropic'];
+const MODEL_KEY = { gemini: 'gemini', groq: 'groq', openrouter: 'openrouter', xai: 'xai', anthropic: 'claude' };
+async function loadSettings() {
+  const s = await api('/api/settings'); $('#appVer').textContent = s.version || '?'; $('#dataDir').textContent = s.dataDir || '';
+  activeId = s.active; $('#cname').value = s.name || '';
+  $('#clientsel').innerHTML = s.clients.map((c) => `<option value="${c.id}">${esc(c.name)}</option>`).join('') + '<option value="__new">+ Novo cliente</option>';
+  $('#clientsel').value = s.active;
+  F.forEach((f) => ($('#p_' + f).value = s.profile[f] || ''));
+  handle = s.profile.handle || '@seuperfil';
+  if (!$('#p_level').value) $('#p_level').value = 'Iniciante';
+  $('#lim_texts').value = s.limits?.maxTexts || 0; $('#lim_images').value = s.limits?.maxImages || 0;
+  const u = s.usage || {}; $('#usageInfo').textContent = `Hoje: ${u.texts || 0} textos e ${u.images || 0} imagens. Neste mês: ${u.mTexts || 0} textos e ${u.mImages || 0} imagens. Os números são contados pelo app e podem diferir do painel do provedor.`;
+  pace = +s.profile.pace || 2.6; $('#scL').value = $('#p_level').value;
+  $('#provider').value = s.provider;
+  PROV.forEach((p) => { $('#m_' + p).value = s.models[MODEL_KEY[p]] || ''; $('#ka_' + p).textContent = s.keys[p] ? 'salva ' + s.keys[p] : 'não cadastrada'; });
+  $('#m_image').value = s.models.image; $('#imgprov').value = s.imageProvider || 'gemini'; $('#m_agnes').value = s.models.agnesImage || ''; $('#m_agnessize').value = s.models.agnesSize || ''; $('#ka_agnes').textContent = s.keys.agnes ? 'salva ' + s.keys.agnes : 'não cadastrada';
+}
+$('#save').onclick = (e) => busy(e.target, 'Salvando…', async () => {
+  const profile = {}; F.forEach((f) => (profile[f] = $('#p_' + f).value));
+  const keys = { agnes: $('#k_agnes').value }, models = { image: $('#m_image').value, agnesImage: $('#m_agnes').value, agnesSize: $('#m_agnessize').value };
+  PROV.forEach((p) => { keys[p] = $('#k_' + p).value; models[MODEL_KEY[p]] = $('#m_' + p).value; });
+  await api('/api/settings', { provider: $('#provider').value, keys, models, profile, name: $('#cname').value, imageProvider: $('#imgprov').value, limits: { maxTexts: +$('#lim_texts').value || 0, maxImages: +$('#lim_images').value || 0 } });
+  PROV.forEach((p) => ($('#k_' + p).value = '')); $('#k_agnes').value = ''; await loadSettings(); toast('Configurações salvas.');
+});
+
+async function reloadAll() {
+  slides = []; curId = null; $('#ed').style.display = 'none'; $('#ct').value = ''; script = null; $('#scOut').style.display = 'none'; $('#scT').value = ''; await loadStyles();
+  ideas = await api('/api/ideas'); renderIdeas(); await loadSettings(); go('ideas');
+}
+$('#clientsel').onchange = async (e) => {
+  const v = e.target.value;
+  try {
+    await persistNow(); clearTimeout(saveT);
+    if (v === '__new') { const n = (prompt('Nome do novo cliente:') || '').trim(); if (!n) return loadSettings(); await api('/api/clients/add', { name: n }); }
+    else await api('/api/clients/select', { id: v });
+    await reloadAll();
+    if (v === '__new') { go('cfg'); toast('Cliente criado. Preencha o perfil e clique em Salvar.'); }
+  } catch (err) { toast(err.message, 1); }
+};
+$('#delcl').onclick = async () => {
+  if (!confirm('Excluir este cliente, as ideias e os carrosséis dele? Não dá para desfazer.')) return;
+  try { await api('/api/clients/delete', { id: activeId }); await reloadAll(); toast('Cliente excluído.'); } catch (e) { toast(e.message, 1); }
+};
+
+(async () => { ideas = await api('/api/ideas'); renderIdeas(); await loadSettings(); await loadStyles();
+  try { const u = await api('/api/update/status'); if (u.to) toast('Content atualizado para a versão ' + u.to + '. ' + (u.notes || '')); } catch {} })();
+$('#updBtn').onclick = (e) => busy(e.target, 'Procurando…', async () => {
+  const c = await api('/api/update/check');
+  if (!c.has) return toast('Você já está na versão mais nova (' + c.current + ').');
+  if (!confirm('Tem versão nova (' + c.latest + ').\n\n' + (c.notes || '') + '\n\nAtualizar agora? Seus dados não mudam.')) return;
+  await api('/api/update/apply', {});
+  toast('Atualizando… a tela recarrega sozinha em alguns segundos.');
+  for (let i = 0; i < 30; i++) { await new Promise((r) => setTimeout(r, 1000)); try { const s = await fetch('/api/settings').then((r) => r.json()); if (s.version === c.latest) return location.reload(); } catch {} }
+  location.reload();
+});
+$('#bkSave').onclick = (e) => busy(e.target, 'Preparando…', async () => {
+  const b = await api('/api/backup');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(b)], { type: 'application/json' }));
+  a.download = 'Content-backup-' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  toast('Backup baixado. Ele está na sua pasta Downloads.');
+});
+$('#bkLoad').onclick = () => $('#bkFile').click();
+$('#bkFile').onchange = async () => {
+  const f = $('#bkFile').files[0]; $('#bkFile').value = ''; if (!f) return;
+  if (!confirm('Restaurar este backup? Os dados atuais serão trocados pelos do arquivo (uma cópia dos atuais fica guardada).')) return;
+  try { const r = await api('/api/backup/restore', JSON.parse(await f.text())); toast('Backup restaurado: ' + r.clients + ' clientes e ' + r.carousels + ' carrosséis.'); await reloadAll(); }
+  catch (e) { toast(e.message.includes('JSON') ? 'Este arquivo não é um backup do Content.' : e.message, 1); }
+};
+</script>
+</body>
+</html>
