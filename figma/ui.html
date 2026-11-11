@@ -1,0 +1,67 @@
+<style>
+body{font:13px Inter,system-ui,sans-serif;margin:0;padding:14px;color:var(--figma-color-text,#222);background:var(--figma-color-bg,#fff)}
+h3{margin:0 0 4px;font-size:15px}.sub{color:var(--figma-color-text-secondary,#777);margin:0 0 10px;font-size:12px}
+#st{padding:8px 10px;border-radius:8px;margin-bottom:10px;font-size:12px}.ok{background:#e6f6ec;color:#11683a}.no{background:#fdecec;color:#9b1c1c}
+label{display:flex;gap:6px;align-items:center;margin-bottom:10px;font-size:12px}
+.it{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--figma-color-border,#eee)}
+.it div{flex:1;min-width:0}.it b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.it small{color:#888}
+button{background:#7c3aed;color:#fff;border:0;border-radius:6px;padding:7px 10px;cursor:pointer;font-size:12px}button:disabled{opacity:.5}
+select{width:100%;margin-bottom:8px;padding:5px}
+</style>
+<h3>Content → Figma</h3>
+<p class="sub">No Content, abra um carrossel e clique em <b>Enviar pro Figma</b>. Ele aparece aqui sozinho, com textos, formas e imagens editáveis.</p>
+<div id="st" class="no">Procurando o Content…</div>
+<label><input type="checkbox" id="auto" checked> Criar automaticamente o que eu enviar do Content</label>
+<select id="cl"></select>
+<div id="list"></div>
+<script>
+const BASE = 'http://localhost:3000';
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const call = async (p, body) => { const r = await fetch(BASE + p, body ? { method: 'POST', headers: { 'content-type': 'text/plain' }, body: JSON.stringify(body) } : {}); const j = await r.json(); if (!r.ok) throw new Error(j.error || 'Erro'); return j; };
+let all = [], online = false, working = false;
+const pending = [];
+
+// Figma só aceita PNG, JPG e GIF: o resto é convertido para PNG.
+async function toBytes(src) {
+  const blob = await (await fetch(src)).blob();
+  if (/image\/(png|jpe?g|gif)/.test(blob.type)) return new Uint8Array(await blob.arrayBuffer());
+  const img = await createImageBitmap(blob), c = document.createElement('canvas'); c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0);
+  return new Uint8Array(await (await new Promise((r) => c.toBlob(r, 'image/png'))).arrayBuffer());
+}
+async function send(c) {
+  const srcs = new Set(); for (const s of c.slides || []) { if (s.image) srcs.add(s.image); for (const e of s.els || []) if (e.type === 'image' && e.src) srcs.add(e.src); }
+  const images = {}; for (const s of srcs) { try { images[s] = await toBytes(s); } catch (e) {} }
+  parent.postMessage({ pluginMessage: { type: 'build', carousel: c, images } }, '*');
+  await new Promise((r) => (window._done = r));
+}
+async function pump() {
+  if (working) return; working = true;
+  while (pending.length) { const c = pending.shift(); try { await send(c); } catch (e) {} }
+  working = false;
+}
+onmessage = (ev) => { const m = ev.data.pluginMessage; if (m && (m.type === 'done' || m.type === 'fail') && window._done) window._done(); };
+
+function render() {
+  const cls = [...new Set(all.map((c) => c.clientName))], cur = $('#cl').value;
+  $('#cl').innerHTML = cls.map((n) => `<option ${n === cur ? 'selected' : ''}>${esc(n)}</option>`).join('');
+  $('#cl').style.display = cls.length > 1 ? '' : 'none';
+  const v = $('#cl').value || cls[0];
+  const l = all.filter((c) => c.clientName === v);
+  $('#list').innerHTML = l.length ? l.map((c) => `<div class="it"><div><b>${esc(c.title)}</b><small>${c.count} slide${c.count > 1 ? 's' : ''} · ${new Date(c.updated).toLocaleString('pt-BR')}</small></div><button data-id="${esc(c.id)}">Criar</button></div>`).join('') : '<p class="sub">Nenhum carrossel na Biblioteca ainda.</p>';
+  $('#list').querySelectorAll('button').forEach((b) => (b.onclick = async () => { b.disabled = true; b.textContent = 'Criando…'; try { pending.push(await call('/api/figma/get', { id: b.dataset.id })); await pump(); } catch (e) { alert(e.message); } b.disabled = false; b.textContent = 'Criar'; }));
+}
+$('#cl').onchange = render;
+async function tick() {
+  try {
+    if ($('#auto').checked) { const q = await call('/api/figma/queue'); if (q.length) { pending.push(...q); pump(); } }
+    else await call('/api/figma/ping');
+    if (!online) { online = true; $('#st').className = 'ok'; $('#st').textContent = 'Conectado ao Content ✓'; }
+    if (!all.length || tick.n++ % 10 === 0) { all = await call('/api/figma/list'); render(); }
+  } catch (e) {
+    online = false; $('#st').className = 'no'; $('#st').textContent = 'Não encontrei o Content. Abra o app pelo ícone "Content" da área de trabalho e deixe-o aberto.';
+  }
+  setTimeout(tick, 2500);
+}
+tick.n = 1; tick();
+</script>

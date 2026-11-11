@@ -5,7 +5,7 @@ const _die = (m) => { console.log('\nERRO: ' + m + '\n\nEsta janela fica aberta 
 process.on('uncaughtException', (e) => _die(e && e.stack || String(e)));
 process.on('unhandledRejection', (e) => _log('rejection: ' + (e && e.stack || e)));
 const http = require('http'), fs = require('fs'), path = require('path'), os = require('os');
-const VERSION = '2.0.0';
+const VERSION = '2.1.0';
 const UPDATE_BASE = process.env.CONTENT_UPDATE_URL || 'https://raw.githubusercontent.com/arotadosmilagres-lgtm/silver-spork/content-app/';
 const PORT = process.env.PORT || 3000;
 const newer = (a, b) => { const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); } return false; };
@@ -277,6 +277,7 @@ async function analyzeStyle(db, images, note) {
   return g;
 }
 const hex = (x, d) => (/^#[0-9a-f]{6}$/i.test(x) ? x : d);
+const FIGMA = { queue: [], lastPoll: 0 };
 const routes = {
   'GET /api/settings': (db) => {
     const s = db.settings;
@@ -331,6 +332,15 @@ const routes = {
     await applyUpdate(info); setTimeout(() => process.exit(75), 300); return { ok: true, version: info.version };
   },
   'GET /api/update/status': () => { const f = path.join(DATA, 'atualizado.json'); try { const j = JSON.parse(fs.readFileSync(f, 'utf8')); fs.unlinkSync(f); return j; } catch { return {}; } },
+  // ---- Figma: o plugin "Content" dentro do Figma busca daqui os carrosséis
+  'POST /api/figma/send': (db, b) => {
+    const id = cid(b.id); if (!fs.existsSync(path.join(CDIR, id + '.json'))) throw new Error('Salve o carrossel antes de enviar.');
+    FIGMA.queue.push(id); return { ok: true, pluginOpen: Date.now() - FIGMA.lastPoll < 8000 };
+  },
+  'GET /api/figma/queue': () => { FIGMA.lastPoll = Date.now(); const ids = FIGMA.queue.splice(0); return ids.map((id) => { try { return JSON.parse(fs.readFileSync(path.join(CDIR, id + '.json'), 'utf8')); } catch { return null; } }).filter(Boolean); },
+  'GET /api/figma/ping': () => { FIGMA.lastPoll = Date.now(); return { ok: true }; },
+  'GET /api/figma/list': (db) => fs.readdirSync(CDIR).filter((f) => f.endsWith('.json')).map((f) => { try { const c = JSON.parse(fs.readFileSync(path.join(CDIR, f), 'utf8')); const cl = db.clients.find((x) => x.id === (c.client || db.clients[0].id)); return cl ? { id: c.id, title: c.title, updated: c.updated, count: (c.slides || []).length, clientName: cl.name, active: cl.id === db.active } : null; } catch { return null; } }).filter(Boolean).sort((a, b) => (b.active - a.active) || (b.updated - a.updated)),
+  'POST /api/figma/get': (db, b) => JSON.parse(fs.readFileSync(path.join(CDIR, cid(b.id) + '.json'), 'utf8')),
   'GET /api/scripts': (db) => cur(db).scripts,
   'POST /api/scripts': (db, b) => { cur(db).scripts = b.scripts; save(db); return { ok: true }; },
   'POST /api/script': async (db, b) => {
@@ -442,6 +452,11 @@ async function makeImage(db, b, prov) {
 http
   .createServer(async (req, res) => {
     const url = req.url.split('?')[0];
+    if (url.startsWith('/api/figma/')) {
+      // O plugin do Figma roda numa página sem endereço ("null"); só estas rotas aceitam ele, e nenhuma delas tem chaves.
+      res.setHeader('access-control-allow-origin', '*'); res.setHeader('access-control-allow-headers', 'content-type'); res.setHeader('access-control-allow-private-network', 'true');
+      if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
+    }
     const handler = routes[`${req.method} ${url}`];
     if (!handler) {
       const f = path.join(__dirname, 'public', url === '/' ? 'index.html' : url);

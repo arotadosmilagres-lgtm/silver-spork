@@ -1,1 +1,1 @@
-{"version":"2.0.0","files":["server.js","public/index.html"],"notes":"Atualização automática, backup diário, botões de backup e troca automática de provedor quando um estiver ocupado."}
+{"version":"2.1.0","files":["server.js","public/index.html","figma/manifest.json","figma/code.js","figma/ui.html"],"notes":"Novo: botão Enviar pro Figma (com o plugin Content no Figma)."}
